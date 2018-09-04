@@ -9,12 +9,18 @@ class TestRoutesCases(unittest.TestCase):
 
     def setUp(self):
         """ Instantiate test client """
-        pass
+        self.app = app.test_client()
     
     def test_fetch_all_orders_operation_success(self):
         """ Test that a valid path that returns HTTP response code of 200(OK)
         """
-        pass
+        test_resp = self.app.get(
+            '/api/v1/orders',
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            test_resp.status_code, 200, msg='Expected 200'
+        )
 
 
     def test_fetch_all_orders_operation_malformed_route(self):
@@ -22,12 +28,12 @@ class TestRoutesCases(unittest.TestCase):
             appropriate error message in JSON and HTTP response code of 
             400 (BAD REQUEST)
         """
-        pass
-
-    def test_fetch_all_orders_operation_non_existent_resource(self):
-        """ Test that path with error(non-existent resource returns an 
-            appropriate error message in JSON and HTTP response 
-            code of 404(NOT FOUND)
-        """
-        pass
-
+        test_resp = self.app.get(
+            '/api/v1/orderss',
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            test_resp.status_code,
+            400,
+            msg='Error: Bad request'
+        )

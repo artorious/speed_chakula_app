@@ -8,18 +8,13 @@ class TestFoodOrders(unittest.TestCase):
     """ Test FoodOrders class """
 
     def setUp(self):
-        pass
+        """ Instantiate """
+        self.sample_food_orders = FoodOrders()
      
     def test_class_inits_with_dict(self):
-        """ Test class inits with an empty dict """
-        pass
+        """ Test class inits with a dict """
+        self.assertIsInstance(
+            self.sample_food_orders.all_food_orders, dict,
+            msg='Class does not initialize with a dict'
+        )
 
-    def test_fetch_all_food_orders_returns_dict(self):
-        """ Test method returns appropriate nested dict with sample data """
-        pass
-    
-    def test_fetch_all_orders_operation_without_orders(self):
-        """ Test method returns of a custom  messege when no orders have
-            been placed (empty orders dict)
-        """
-        pass
