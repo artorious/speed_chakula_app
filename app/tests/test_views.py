@@ -26,7 +26,7 @@ class TestRoutesCases(unittest.TestCase):
     def test_fetch_all_orders_operation_malformed_route(self):
         """ Test that a path with an error (malformed syntax) returns an 
             appropriate error message in JSON and HTTP response code of 
-            400 (BAD REQUEST)
+            404 (NOT FOUND)
         """
         test_resp = self.app.get(
             '/api/v1/orderss',
@@ -34,6 +34,6 @@ class TestRoutesCases(unittest.TestCase):
         )
         self.assertEqual(
             test_resp.status_code,
-            400,
-            msg='Error: Bad request'
+            404,
+            msg='Error: The requested URL was not found on the server'
         )

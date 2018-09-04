@@ -18,11 +18,11 @@ class FoodOrders():
     """
 
     def __init__(self):
-        pass
+        self.all_food_orders = {}
 
     def fetch_all_food_orders(self):
         """ (FoodOrders) -> dict
 
             Fetches all food orders. Returns a dict.
         """
-        return
+        return self.all_food_orders

@@ -12,4 +12,4 @@ sample_food_offers = FoodOrders()
 @app.route('/api/v1/orders', methods=['GET'])
 def fetch_all_orders():
     """ Fetches all food orders """
-    pass
+    return jsonify(sample_food_offers.all_food_orders)
