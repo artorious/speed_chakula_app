@@ -11,6 +11,7 @@ pytest = "*"
 pytest-cache = "*"
 "pytest-pep8" = "*"
 flask = "*"
+coverage = "*"
 
 [dev-packages]
 
