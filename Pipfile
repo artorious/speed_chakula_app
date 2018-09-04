@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 ipython = "*"
 pylint = "*"
+pycodestyle = "*"
 
 [dev-packages]
 
