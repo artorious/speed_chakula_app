@@ -6,7 +6,7 @@ class FoodOrders():
 
         Attributes:
             all_food_orders (dict) - Variable holds all food orders
-                {order_count(int): 
+                {order_count(int):
                     {'orderID': int,
                     'username': str,
                     'order_qty': int,
@@ -26,3 +26,11 @@ class FoodOrders():
             Fetches all food orders. Returns a dict.
         """
         return self.all_food_orders
+
+    def place_new_order(self, order_request_info):
+        """ (FoodOrders, dict) -> dict
+
+            Creates a new food order with provided <order_info>.
+            Returns message to user on creation or failure
+        """
+        return
