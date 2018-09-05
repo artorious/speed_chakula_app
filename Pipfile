@@ -12,6 +12,7 @@ pytest-cache = "*"
 "pytest-pep8" = "*"
 flask = "*"
 coverage = "*"
+coveralls = "*"
 
 [dev-packages]
 
