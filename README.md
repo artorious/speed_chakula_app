@@ -2,3 +2,7 @@
 
 # speedy_chakula_app
 A fast-Food-Fast is a food delivery service app for a restaurant
+
+# Features
+* Retrieve and display all food orders 
+* Place a new food order
