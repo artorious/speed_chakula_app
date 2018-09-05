@@ -18,4 +18,15 @@ def fetch_all_orders():
 @app.route('/api/v1/orders', methods=['POST'])
 def place_new_order():
     """ Creates a new food order """
-    return
+    req_data = request.get_json()
+
+    if (
+            'username' in req_data and
+            'user_tel' in req_data and
+            'order_qty' in req_data and
+            'order_description' in req_data and
+            'user_location' in req_data
+    ):
+        return jsonify(SAMPLE_FOOD_ORDERS.place_new_order(req_data))
+    else:
+        return jsonify({'Order placement message': 'Order placement Failed'})

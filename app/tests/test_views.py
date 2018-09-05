@@ -13,8 +13,10 @@ class TestRoutesCases(unittest.TestCase):
         self.app = app.test_client()
         self.sample_order_request_info = {
             'username': 'mrnoname',
+            'user_tel': '0727161173',
             'order_qty': 2,
-            'order_description': '500ml soda @Ksh. 100/='
+            'order_description': '500ml soda @Ksh. 100/=',
+            'user_location': '221B Baker st.'
         }
 
     def test_fetch_all_orders_operation_success(self):
@@ -52,7 +54,7 @@ class TestRoutesCases(unittest.TestCase):
             data=json.dumps(self.sample_order_request_info),
             headers={'content-type': 'application/json'}
         )
-        self.assertEqual(test_resp.status_code, 201)
+        self.assertEqual(test_resp.status_code, 200)
         self.assertIn(b'Order placement message', test_resp.data)
 
     def test_place_new_order_operation_malformed_route(self):

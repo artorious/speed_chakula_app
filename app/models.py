@@ -19,6 +19,7 @@ class FoodOrders():
 
     def __init__(self):
         self.all_food_orders = {}
+        self.food_order_count = 1
 
     def fetch_all_food_orders(self):
         """ (FoodOrders) -> dict
@@ -33,4 +34,10 @@ class FoodOrders():
             Creates a new food order with provided <order_info>.
             Returns message to user on creation or failure
         """
-        return
+        if isinstance(order_request_info, dict):
+            self.all_food_orders[self.food_order_count] = order_request_info
+            self.food_order_count += 1
+
+            return {'Order placement message': 'Order succesfully placed'}
+        else:
+            raise TypeError('Argument should be a dictionary')
