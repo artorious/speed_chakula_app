@@ -31,7 +31,10 @@ def place_new_order():
     else:
         return jsonify('Sorry.... Order placement Failed')
 
-@app.route('/api/v1/orders/<int:orderID>', methods=['GET'])
-def fetch_order_by_id(orderId):
-    """ Fetches a single food order corresponding to the provided <orderID>"""
-    return
+@app.route('/api/v1/orders/<int:orderid>', methods=['GET'])
+def fetch_order_by_id(orderid):
+    """ Fetches a single food order corresponding to the provided <orderid>"""
+    if isinstance(orderid, int):
+        return jsonify(SAMPLE_FOOD_ORDERS.fetch_order_by_id(orderid))
+    else:
+        return jsonify({"Order fetching error message": "orderid should be integer"})

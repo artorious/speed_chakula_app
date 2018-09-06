@@ -2,13 +2,14 @@
 
 import datetime
 
+
 class FoodOrders():
     """ Holds methods for food orders
 
         Attributes:
             all_food_orders (dict) - Variable holds all food orders
                 {order_count(int):
-                    {'orderID': int,
+                    {'orderid': int,
                     'username': str,
                     'order_qty': int,
                     'order_description': str,
@@ -46,12 +47,21 @@ class FoodOrders():
         else:
             raise TypeError("Argument should be a dictionary")
 
-    def fetch_order_by_id(self, orderID):
+    def fetch_order_by_id(self, orderid):
         """ (FoodOrders, int) -> dict
 
-            Returns food order with corresponding orderId
+            Returns food order with corresponding orderid
         """
-        return
+        try:
+            int(orderid)
+            if orderid in self.all_food_orders:
+                return self.all_food_orders[orderid]
+            else:
+                return {"Order fetching error message": "orderid out of range"}
+        except ValueError:
+            return {
+                "Order fetching error message": "orderid should be integer"
+            }
 
 
 if __name__ == '__main__':

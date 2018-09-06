@@ -86,7 +86,7 @@ class TestRoutesCases(unittest.TestCase):
         self.assertIn(b'Sorry.... Order placement Failed', test_resp.data)
 
     def test_fetch_one_order_operation_success(self):
-        """ Test that a  non-error path returns a single order in JSON and 
+        """ Test that a  non-error path returns a single order in JSON and
             HTTP response code of 200 (OK)
         """
         self.app.post(
@@ -95,7 +95,7 @@ class TestRoutesCases(unittest.TestCase):
             headers={'content-type': 'application/json'}
         )
 
-        test_resp = test_resp = self.app.get(
+        test_resp = self.app.get(
             '/api/v1/orders/1',
             headers={'content-type': 'application/json'}
         )
@@ -115,7 +115,7 @@ class TestRoutesCases(unittest.TestCase):
         )
 
         test_resp = self.app.get(
-            '/api/v1/orderss/1',
+            '/api/v1/orders/one',
             headers={'content-type': 'application/json'}
         )
         self.assertEqual(
@@ -124,57 +124,6 @@ class TestRoutesCases(unittest.TestCase):
             msg='Error: The requested URL was not found on the server'
         )
 
-    def test_fetch_one_order_operation_with_invalid_orderid(self):
-        """ Test that invalid orderId returns custom error message 
-            (only positive int)
-        """
-        self.app.post(
-            '/api/v1/orders',
-            data=json.dumps(self.sample_order_request_info),
-            headers={'content-type': 'application/json'}
-        )
-
-        test_resp = test_resp = self.app.get(
-            '/api/v1/orders/one',
-            headers={'content-type': 'application/json'}
-        )
-        
-        self.assertIn(
-            b"Order fetching error message",
-            test_resp,
-            msg="Route does not handle non-integers for orderID"
-        )
-
-    def test_fetch_one_order_operation_with_out_of_range_orderid(self):
-        """ Test that out of range orderId returns custom error message 
-            (Out of range) - 416 Requested Range Not Satisfiable
-        """
-        self.app.post(
-            '/api/v1/orders',
-            data=json.dumps(self.sample_order_request_info),
-            headers={'content-type': 'application/json'}
-        )
-
-        test_resp = test_resp = self.app.get(
-            '/api/v1/orders/2',
-            headers={'content-type': 'application/json'}
-        )
-        
-        self.assertIn(
-            b"Order fetching error message",
-            test_resp,
-            msg="Route does not handle out of range integers for orderID"
-        )
-
-        test_resp = test_resp = self.app.get(
-            '/api/v1/orders/0',
-            headers={'content-type': 'application/json'}
-        )
-        self.assertIn(
-            b"Order fetching error message",
-            test_resp,
-            msg="Route does not handle out of range integers for orderID"
-        )
 
 if __name__ == '__main__':
     unittest.main()

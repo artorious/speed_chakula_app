@@ -56,7 +56,7 @@ class TestFoodOrders(unittest.TestCase):
     def test_fetch_one_order_returns_dict(self):
         """ Test that fetch_one_order() returns dict """
         self.sample_food_orders.place_new_order(
-            self.sample_food_orders
+            self.sample_order_request_info
         )
 
         self.assertIsInstance(
@@ -66,43 +66,43 @@ class TestFoodOrders(unittest.TestCase):
         )
 
     def test_fetch_one_order_handles_out_of_range_orderid(self):
-        """ Test that out of range orderId return custom error message 
+        """ Test that out of range orderid return custom error message
             (Out of range)
         """
         self.sample_food_orders.place_new_order(
-            self.sample_food_orders
+            self.sample_order_request_info
         )
 
-        self.assertIn(
-            b"Order fetching error message",
+        self.assertDictEqual(
             self.sample_food_orders.fetch_order_by_id(2),
+            {"Order fetching error message": "orderid out of range"},
             msg="Method does not handle out of range orders"
         )
 
-        self.assertIn(
-            b"Order fetching error message",
-            self.sample_food_orders.fetch_order_by_id(0),
+        self.assertDictEqual(
+            self.sample_food_orders.fetch_order_by_id(2),
+            {"Order fetching error message": "orderid out of range"},
             msg="Method does not handle out of range orders"
         )
 
     def test_fetch_one_order_with_non_int_orderid(self):
-        """ Test that invalid (non-int) orderId returns custom error message
+        """ Test that invalid (non-int) orderid returns custom error message
             (only positive int)
         """
         self.sample_food_orders.place_new_order(
-            self.sample_food_orders
+            self.sample_order_request_info
         )
 
-        self.assertIn(
-            b"Order fetching error message",
+        self.assertDictEqual(
             self.sample_food_orders.fetch_order_by_id('2.0'),
-            msg="Method does not handle non-integers for oderID"
+            {"Order fetching error message": "orderid should be integer"},
+            msg="Method does not handle non-integers for orderid"
         )
 
-        self.assertIn(
-            b"Order fetching error message",
+        self.assertDictEqual(
             self.sample_food_orders.fetch_order_by_id('one'),
-            msg="Method does not handle non-integers for oderID"
+            {"Order fetching error message": "orderid should be integer"},
+            msg="Method does not handle non-integers for orderid"
         )
 
 
