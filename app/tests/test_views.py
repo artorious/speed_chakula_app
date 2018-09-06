@@ -83,7 +83,7 @@ class TestRoutesCases(unittest.TestCase):
             data=json.dumps('I want everthing'),
             headers={'content-type': 'application/json'}
         )
-        self.assertIn(b'Order placement message', test_resp.data)
+        self.assertIn(b'Sorry.... Order placement Failed', test_resp.data)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 """ Data representation - holds routines for user to interact with the API."""
 
+import datetime
 
 class FoodOrders():
     """ Holds methods for food orders
@@ -12,7 +13,7 @@ class FoodOrders():
                     'order_qty': int,
                     'order_description': str,
                     'order_datetime': str,
-                    'order_status': bool
+                    'order_accept_status': bool
                     }
                 }
     """
@@ -35,6 +36,9 @@ class FoodOrders():
             Returns message to user on creation or failure
         """
         if isinstance(order_request_info, dict):
+            order_request_info['order_datetime'] = \
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            order_request_info['order_accept_status'] = False
             self.all_food_orders[self.food_order_count] = order_request_info
             self.food_order_count += 1
 

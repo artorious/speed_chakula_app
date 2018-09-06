@@ -29,4 +29,4 @@ def place_new_order():
     ):
         return jsonify(SAMPLE_FOOD_ORDERS.place_new_order(req_data))
     else:
-        return jsonify({'Order placement message': 'Order placement Failed'})
+        return jsonify('Sorry.... Order placement Failed')
