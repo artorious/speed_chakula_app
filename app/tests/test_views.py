@@ -85,6 +85,36 @@ class TestRoutesCases(unittest.TestCase):
         )
         self.assertIn(b'Sorry.... Order placement Failed', test_resp.data)
 
+    def test_fetch_one_order_operation_success(self):
+        """ Test that a  non-error path returns a single order in JSON and 
+            HTTP response code of 200 (OK)
+        """
+        pass
+
+    def test_fetch_one_order_operation_with_malformed_route(self):
+        """ Test that a path with an error(non-existent) returns an appropriate
+            error message in JSON and HTTP response code of 404(NOT FOUND)
+        """
+        pass
+
+    def test_fetch_one_order_operation_without_orderid(self):
+        """ Test that path with an error (malformed syntax) returns an
+            appropriate error message in JSON and HTTP response code of 
+            400 (BAD REQUEST)
+        """
+        pass
+
+    def test_fetch_one_order_operation_with_invalid_orderid(self):
+        """ Test that invalid orderId returns custom error message 
+            (only positive int)
+        """
+        pass
+
+    def test_fetch_one_order_operation_with_out_of_range_orderid(self):
+        """ Test that out of range orderId returns custom error message 
+            (Out of range) - 416 Requested Range Not Satisfiable
+        """
+        pass
 
 if __name__ == '__main__':
     unittest.main()

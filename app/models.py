@@ -42,6 +42,17 @@ class FoodOrders():
             self.all_food_orders[self.food_order_count] = order_request_info
             self.food_order_count += 1
 
-            return {'Order placement message': 'Order succesfully placed'}
+            return {"Order placement message": "Order succesfully placed"}
         else:
-            raise TypeError('Argument should be a dictionary')
+            raise TypeError("Argument should be a dictionary")
+
+    def fetch_order_by_id(self, orderID):
+        """ (FoodOrders, int) -> dict
+
+            Returns food order with corresponding orderId
+        """
+        return
+
+
+if __name__ == '__main__':
+    FoodOrders()

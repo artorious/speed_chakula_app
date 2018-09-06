@@ -30,3 +30,8 @@ def place_new_order():
         return jsonify(SAMPLE_FOOD_ORDERS.place_new_order(req_data))
     else:
         return jsonify('Sorry.... Order placement Failed')
+
+@app.route('/api/v1/orders/<int:orderID>', methods=['GET'])
+def fetch_order_by_id(orderId):
+    """ Fetches a single food order corresponding to the provided <orderID>"""
+    return
