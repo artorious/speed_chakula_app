@@ -116,7 +116,7 @@ class TestFoodOrders(unittest.TestCase):
             dict,
             msg='Method does not return a dict'
         )
-    
+
     def test_update_order_handles_out_of_range_orderid(self):
         """ Test that out of range orderid return custom error message
             (Out of range)
@@ -139,7 +139,7 @@ class TestFoodOrders(unittest.TestCase):
 
     def test_update_order_handles_invalid_input(self):
         """ Test that invalid (non-int) orderid and update_status (non-bool)
-            returns custom error message    
+            returns custom error message
         """
         self.sample_food_orders.place_new_order(
             self.sample_order_request_info

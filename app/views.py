@@ -28,16 +28,18 @@ def place_new_order():
             'user_location' in req_data
     ):
         return jsonify(SAMPLE_FOOD_ORDERS.place_new_order(req_data))
-    else:
-        return jsonify('Sorry.... Order placement Failed')
+    return jsonify('Sorry.... Order placement Failed')
+
 
 @app.route('/api/v1/orders/<int:orderid>', methods=['GET'])
 def fetch_order_by_id(orderid):
     """ Fetches a single food order matching the provided <orderid>"""
     if isinstance(orderid, int):
         return jsonify(SAMPLE_FOOD_ORDERS.fetch_order_by_id(orderid))
-    else:
-        return jsonify({"Order fetching error message": "orderid should be integer"})
+    return jsonify(
+        {"Order fetching error message": "orderid should be integer"}
+    )
+
 
 @app.route('/api/v1/orders/<int:orderid>', methods=['PUT'])
 def update_order_by_id(orderid):
@@ -45,5 +47,7 @@ def update_order_by_id(orderid):
     req_data = request.get_json()
 
     if isinstance(orderid, int) and isinstance(req_data, bool):
-        return jsonify(SAMPLE_FOOD_ORDERS.update_order_by_id(orderid, req_data))
+        return jsonify(
+            SAMPLE_FOOD_ORDERS.update_order_by_id(orderid, req_data)
+        )
     return jsonify({"Order update message": "Update Failed..Invalid input"})

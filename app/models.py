@@ -44,8 +44,7 @@ class FoodOrders():
             self.food_order_count += 1
 
             return {"Order placement message": "Order succesfully placed"}
-        else:
-            raise TypeError("Argument should be a dictionary")
+        raise TypeError("Argument should be a dictionary")
 
     def fetch_order_by_id(self, orderid):
         """ (FoodOrders, int) -> dict
@@ -56,8 +55,7 @@ class FoodOrders():
             int(orderid)
             if orderid in self.all_food_orders:
                 return self.all_food_orders[orderid]
-            else:
-                return {"Order fetching error message": "orderid out of range"}
+            return {"Order fetching error message": "orderid out of range"}
         except ValueError:
             return {
                 "Order fetching error message": "orderid should be integer"
@@ -75,7 +73,7 @@ class FoodOrders():
                 return {"Order update message": "Update Successful"}
             return {"Order update error message": "orderid out of range"}
         return {
-                "Order update error message": "Invalid Input"
+            "Order update error message": "Invalid Input"
             }
 
 
