@@ -13,6 +13,7 @@ pytest-cache = "*"
 flask = "*"
 coverage = "*"
 coveralls = "*"
+gunicorn = "*"
 
 [dev-packages]
 
