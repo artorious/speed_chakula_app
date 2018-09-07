@@ -54,7 +54,7 @@ class TestFoodOrders(unittest.TestCase):
         )
 
     def test_fetch_one_order_returns_dict(self):
-        """ Test that fetch_one_order() returns dict """
+        """ Test that fetch_order_by_id(orderid) returns dict """
         self.sample_food_orders.place_new_order(
             self.sample_order_request_info
         )
@@ -102,6 +102,58 @@ class TestFoodOrders(unittest.TestCase):
         self.assertDictEqual(
             self.sample_food_orders.fetch_order_by_id('one'),
             {"Order fetching error message": "orderid should be integer"},
+            msg="Method does not handle non-integers for orderid"
+        )
+
+    def test_update_order_returns_dict(self):
+        """ Test that update_order_by_id(orderid) returns dict """
+        self.sample_food_orders.place_new_order(
+            self.sample_order_request_info
+        )
+
+        self.assertIsInstance(
+            self.sample_food_orders.update_order_by_id(1, True),
+            dict,
+            msg='Method does not return a dict'
+        )
+    
+    def test_update_order_handles_out_of_range_orderid(self):
+        """ Test that out of range orderid return custom error message
+            (Out of range)
+        """
+        self.sample_food_orders.place_new_order(
+            self.sample_order_request_info
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.update_order_by_id(2, True),
+            {"Order update error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.update_order_by_id(0, True),
+            {"Order update error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+    def test_update_order_handles_invalid_input(self):
+        """ Test that invalid (non-int) orderid and update_status (non-bool)
+            returns custom error message    
+        """
+        self.sample_food_orders.place_new_order(
+            self.sample_order_request_info
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.update_order_by_id('2.0', True),
+            {"Order update error message": "Invalid Input"},
+            msg="Method does not handle non-integers for orderid"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.update_order_by_id(1, "True"),
+            {"Order update error message": "Invalid Input"},
             msg="Method does not handle non-integers for orderid"
         )
 

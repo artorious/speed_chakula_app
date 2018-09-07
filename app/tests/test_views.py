@@ -124,6 +124,73 @@ class TestRoutesCases(unittest.TestCase):
             msg='Error: The requested URL was not found on the server'
         )
 
+    def test_update_order_operation_success(self):
+        """ Test that a  non-error path returns a single order in JSON and
+            HTTP response code of 200 (OK)
+        """
+        self.app.post(
+            '/api/v1/orders',
+            data=json.dumps(self.sample_order_request_info),
+            headers={'content-type': 'application/json'}
+        )
+
+        test_resp = self.app.put(
+            '/api/v1/orders/1',
+            data=json.dumps(True),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            test_resp.status_code, 200, msg='Expected 200'
+        )
+
+    def test_update_order_operation_malformed_route(self):
+        """ Test that path with an error (malformed syntax) returns an
+            appropriate error message in JSON and HTTP response code of
+            404 (BAD REQUEST)
+        """
+
+        self.app.post(
+            '/api/v1/orders',
+            data=json.dumps(self.sample_order_request_info),
+            headers={'content-type': 'application/json'}
+        )
+
+        test_resp = self.app.put(
+            '/api/v1/orders/one',
+            data=json.dumps(True),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            test_resp.status_code,
+            404,
+            msg='Error: The requested URL was not found on the server'
+        )
+    
+    def test_update_order_operation_malformed_data(self):
+        """ Test that path with an error (malformed data) returns an
+            appropriate error message in JSON and HTTP response code of
+            409 (RESOURCE CONFLICT)
+
+            Tests payload before deploying
+        """
+        self.app.post(
+            '/api/v1/orders',
+            data=json.dumps(self.sample_order_request_info),
+            headers={'content-type': 'application/json'}
+        )
+
+        test_resp = self.app.put(
+            '/api/v1/orders/1',
+            data=json.dumps("True"),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            test_resp.status_code,
+            409,
+            msg='Error: RESOURCE CONFLICT'
+        )
+        self.assertIn(b'Sorry.... Order update Failed', test_resp.data)
+
 
 if __name__ == '__main__':
     unittest.main()
