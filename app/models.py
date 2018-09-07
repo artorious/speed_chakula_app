@@ -62,12 +62,21 @@ class FoodOrders():
             return {
                 "Order fetching error message": "orderid should be integer"
             }
+
     def update_order_by_id(self, orderid, update_status):
         """ (FoodOrders, int, bool) -> dict
 
             Returns custom message to user to indicat update status
         """
-        return
+        if isinstance(orderid, int) and isinstance(update_status, bool):
+            if orderid in self.all_food_orders:
+                self.all_food_orders[orderid]['order_accept_status'] =\
+                    update_status
+                return {"Order update message": "Update Successful"}
+            return {"Order update error message": "orderid out of range"}
+        return {
+                "Order update error message": "Invalid Input"
+            }
 
 
 if __name__ == '__main__':

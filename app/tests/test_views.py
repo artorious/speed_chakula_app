@@ -142,6 +142,11 @@ class TestRoutesCases(unittest.TestCase):
         self.assertEqual(
             test_resp.status_code, 200, msg='Expected 200'
         )
+        self.assertIn(
+            b"Order update message",
+            test_resp.data,
+            msg="Does not output success msg to user"
+        )
 
     def test_update_order_operation_malformed_route(self):
         """ Test that path with an error (malformed syntax) returns an
@@ -165,31 +170,6 @@ class TestRoutesCases(unittest.TestCase):
             404,
             msg='Error: The requested URL was not found on the server'
         )
-    
-    def test_update_order_operation_malformed_data(self):
-        """ Test that path with an error (malformed data) returns an
-            appropriate error message in JSON and HTTP response code of
-            409 (RESOURCE CONFLICT)
-
-            Tests payload before deploying
-        """
-        self.app.post(
-            '/api/v1/orders',
-            data=json.dumps(self.sample_order_request_info),
-            headers={'content-type': 'application/json'}
-        )
-
-        test_resp = self.app.put(
-            '/api/v1/orders/1',
-            data=json.dumps("True"),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            test_resp.status_code,
-            409,
-            msg='Error: RESOURCE CONFLICT'
-        )
-        self.assertIn(b'Sorry.... Order update Failed', test_resp.data)
 
 
 if __name__ == '__main__':

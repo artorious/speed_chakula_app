@@ -42,4 +42,8 @@ def fetch_order_by_id(orderid):
 @app.route('/api/v1/orders/<int:orderid>', methods=['PUT'])
 def update_order_by_id(orderid):
     """ Updates a single food order matching the provided <orderid> """
-    return
+    req_data = request.get_json()
+
+    if isinstance(orderid, int) and isinstance(req_data, bool):
+        return jsonify(SAMPLE_FOOD_ORDERS.update_order_by_id(orderid, req_data))
+    return jsonify({"Order update message": "Update Failed..Invalid input"})
