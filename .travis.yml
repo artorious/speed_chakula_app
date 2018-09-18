@@ -8,6 +8,6 @@ install: "make"
 
 # command to run tests
 script:
-    - coverage run -m pytest
+    - coverage run --source app/tests/ -m pytest
 after_success:
     - coveralls
