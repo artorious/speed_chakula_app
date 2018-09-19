@@ -11,11 +11,19 @@ def index():
     """ Homepage. Returns welcome message """
     return
 
+
 @app.route('/api/v1/orders', methods=['GET', 'POST'])
 def orders():
     """ Fetch all food orders or create a new food order """
     return
 
-@app.route('/api/v1/orders/<int:orderid>', methods=['GET', 'PUT', 'PATCH', 'DELETE'])
+
+@app.route(
+    '/api/v1/orders/<int:orderid>', methods=['GET', 'PUT', 'PATCH', 'DELETE']
+)
 def order_by_id():
+    """ Operate on a food order by <orderid>
+
+        Display food order, update order status, ...
+    """
     return

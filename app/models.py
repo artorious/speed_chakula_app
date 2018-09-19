@@ -1,5 +1,5 @@
 """ Data representation - Routines for user to interact with the API.
-    
+
     Attributes:
         ORDER_COUNT (int) - Global variable holds count of food orders
 
@@ -13,19 +13,20 @@
                 'order_accept_status': bool
                 'user_location': 'str'
                 }
-            }      
+            }
 """
 
 import datetime
- 
+
 # GLOBAL Var to hold all food orders
 # GLobal var to hold counter
+
 
 class FoodOrders():
     """ Holds methods to display all and create food orders """
     def __init__(self):
         pass
-    
+
     def get(self):
         """ (FoodOrders) -> dict
 
@@ -43,6 +44,7 @@ class FoodOrders():
         """
         return
 
+
 class FoodOrderOps():
     """ Holds methods for operations on individual(by orderID) food orders """
     def __init__(self):
@@ -59,19 +61,19 @@ class FoodOrderOps():
     def put(self, order_id, order_status):
         """ (FoodOrderOps, int, bool) -> dict
 
-            Returns a dictionary with a custom message to user to indicate 
+            Returns a dictionary with a custom message to user to indicate
             order acceptance update Success or failure.
         """
         return
-    
-    #TODO:
-    def patch(self, order_id, food_order_changes):
-        """ update food order by <order_id> with <food_order_changes> """
-        pass
 
-    def delete(self, order_id):
-        """ delete food order by <order_id> """
-        pass
+    # TODO:
+    # def patch(self, order_id, food_order_changes):
+    #     """ update food order by <order_id> with <food_order_changes> """
+    #     pass
+
+    # def delete(self, order_id):
+    #     """ delete food order by <order_id> """
+    #     pass
 
 
 if __name__ == '__main__':

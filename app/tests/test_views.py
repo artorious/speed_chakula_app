@@ -19,7 +19,6 @@ class TestHomePage(unittest.TestCase):
 
         self.assertEqual(test_resp.status_code, 200)
         self.assertNotEqual(test_resp.status_code, 404)
-        
 
     def test_index_output_data(self):
         """Test for home page status code 200(ok)"""
@@ -29,12 +28,12 @@ class TestHomePage(unittest.TestCase):
         )
 
         self.assertIn(test_resp.data, b"Welcome User", msg="Homepage message")
-       
+
     def tearDown(self):
         pass
 
 class TestOrdersRoutes(unittest.TestCase):
-
+    """ Test routes """
     def setUp(self):
         """ Instantiate test client """
         self.app = app.test_client()
@@ -45,7 +44,7 @@ class TestOrdersRoutes(unittest.TestCase):
             'order_description': '500ml soda @Ksh. 100/=',
             'user_location': '221B Baker st.'
         }
-    
+
     def test_get_orders_status_code(self):
         """ Test that a valid path that returns HTTP response code of 200(OK)
         """
@@ -59,7 +58,7 @@ class TestOrdersRoutes(unittest.TestCase):
         self.assertNotEqual(
             test_resp.status_code, 404, msg='Expected 200'
         )
-    
+
     def test_post_orders_status_code(self):
         """ Test that valid path and data for successful order creation
             returns HTTP status 201 and a custom message to indicate success
@@ -92,6 +91,7 @@ class TestOrdersRoutes(unittest.TestCase):
         pass
 
 class TestOrderByIdRoutes(unittest.TestCase):
+    """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
         self.app = app.test_client()
@@ -124,10 +124,10 @@ class TestOrderByIdRoutes(unittest.TestCase):
             test_resp.status_code, 404, msg='Expected 200'
         )
 
-      
+
     def test_get_order_by_id_response_data(self):
-        # make one and see
-        self.app.post(
+        """ Tests fetching of one food order by orderid """
+        test_data = self.app.post(
             '/api/v1/orders',
             data=json.dumps(self.sample_order_request_info),
             headers={'content-type': 'application/json'}
@@ -154,7 +154,6 @@ class TestOrderByIdRoutes(unittest.TestCase):
             "user_location", test_data, msg="user_location absent from food order"
         )
 
-    
     def test_put_order_by_id_status_code(self):
         """ Test that a  non-error path returns a single order in JSON and
             HTTP response code of 200 (OK)
@@ -176,8 +175,7 @@ class TestOrderByIdRoutes(unittest.TestCase):
         self.assertNotEqual(
             test_resp.status_code, 404, msg='Expected 200'
         )
-        
-    
+
     def test_put_order_by_id_response_data(self):
         """ Test that a  non-error path updates a single order's accept_status
             in JSON and returns a Success message
@@ -193,13 +191,13 @@ class TestOrderByIdRoutes(unittest.TestCase):
             data=json.dumps(True),
             headers={'content-type': 'application/json'}
         )
-    
+
         self.assertIn(
             b"Order status message",
             test_resp.data,
             msg="Does not output success msg to user"
         )
-    
+
     def tearDown(self):
         pass
 
