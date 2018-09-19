@@ -79,7 +79,7 @@ class TestFoodOrders(unittest.TestCase):
         self.assertIn(
             "Success",
             self.sample_food_orders.post(self.sample_order_request_info),
-            msg="Order not creadted succesfully"
+            msg="Order not created succesfully"
         )
     
     def tearDown(self):
@@ -89,46 +89,122 @@ class TestFoodOrdersOps(unittest.TestCase):
     """ Test FoodOrdersOps class """
     
     def setUp(self):
-        pass
+        """ Instantiate """
+        self.sample_food_orders = FoodOrderOps()
+        self.sample_order_request_info = {
+            "username": "mrnoname",
+            "order_qty": 2,
+            "order_description": "500ml soda @Ksh. 100/="
+        }
     
     def test_get_returns_dict_of_correct_format(self):
         """ Test that get(orderid) returns dict """
-        pass
+        self.assertIsInstance(
+            self.sample_food_orders.get(1),
+            dict,
+            msg="Method does not return Dict"
+        )
     
     def test_get_handles_out_of_range_orderid(self):
         """ Test that out of range orderid return custom error message
             (Out of range)
         """
-        pass
+        self.assertDictEqual(
+            self.sample_food_orders.get(1),
+            {"Order fetching error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.get(-1),
+            {"Order fetching error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.get(0),
+            {"Order fetching error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.get(2),
+            {"Order fetching error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
 
     def test_get_with_non_int_orderid(self):
         """ Test that invalid (non-int) orderid returns custom error message
             (only positive int)
         """
-        pass
+        self.assertDictEqual(
+            self.sample_food_orders.get('2.0'),
+            {"Order fetching error message": "orderid should be integer"},
+            msg="Method does not handle non-integers for orderid"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.get('one'),
+            {"Order fetching error message": "orderid should be integer"},
+            msg="Method does not handle non-integers for orderid"
+        )
     
-    def test_get_handles_negative_int_as_order_id(self):
-        pass
 
     def test_put_returns_dict(self):
         """ Test that put(orderid, order_status) returns dict """
-        pass
+        test_data = FoodOrders.post(self.sample_order_request_info)
+
+        self.assertIsInstance(
+            self.sample_food_orders.put(1, True),
+            dict,
+            msg='Method does not return a dict'
+        )
 
     def test_put_returns_operational_message(self):
         """ Success or failure """
-        pass
+        self.assertIn(
+            "Order status message",
+            self.sample_food_orders.put(1, True),
+            msg="Order status message not found"
+        )
 
     def test_put_handles_out_of_range_orderid(self):
         """ Test that out of range orderid return custom error message
             (Out of range)
         """
-        pass
+        self.assertDictEqual(
+            self.sample_food_orders.put(2, True),
+            {"Order update error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.put(0, True),
+            {"Order update error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.put(-1, True),
+            {"Order update error message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
 
     def test_put_handles_invalid_input(self):
         """ Test that invalid (non-int) orderid and or  update_status (non-bool)
             returns custom error message
         """
-        pass
+        self.assertDictEqual(
+            self.sample_food_orders.put('2.0', True),
+            {"Order update error message": "Invalid Input"},
+            msg="Method does not handle non-integers for orderid"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.put(1, "True"),
+            {"Order update error message": "Invalid Input"},
+            msg="Method does not handle non-integers for orderid"
+        )
 
 
 
