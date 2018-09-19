@@ -7,16 +7,29 @@ from app import app
 class TestHomePage(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
-        pass
+        """ Instantiate test client """
+        self.app = app.test_client()
 
     def test_index_status_code(self):
-        # is 200
-        # also No 404
-        pass
+        """Test for home page data"""
+        test_resp = self.app.get(
+            '/api/v1/',
+            headers={'content-type': 'application/json'}
+        )
+
+        self.assertEqual(test_resp.status_code, 200)
+        self.assertNotEqual(test_resp.status_code, 404)
+        
 
     def test_index_output_data(self):
-        pass
+        """Test for home page status code 200(ok)"""
+        test_resp = self.app.get(
+            '/api/v1/',
+            headers={'content-type': 'application/json'}
+        )
 
+        self.assertIn(test_resp.data, b"Welcome User", msg="Homepage message")
+       
     def tearDown(self):
         pass
 
