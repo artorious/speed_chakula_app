@@ -4,13 +4,14 @@
         ORDER_COUNT (int) - Global variable holds count of food orders
 
         ALL_FOOD_ORDERS (dict) - Global variable holds all food orders
-            {order_count(int):
-                {'orderid': int,
+            {order_id(int):
+                {'user_tel': str,
                 'username': str,
                 'order_qty': int,
                 'order_description': str,
                 'order_datetime': str,
                 'order_accept_status': bool
+                'user_location': 'str'
                 }
             }      
 """
