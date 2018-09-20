@@ -27,7 +27,7 @@ class TestHomePage(unittest.TestCase):
             headers={'content-type': 'application/json'}
         )
 
-        self.assertIn(test_resp.data, b"Welcome User", msg="Homepage message")
+        self.assertIn(b"Welcome User", test_resp.data, msg="Homepage message")
 
     def tearDown(self):
         pass
@@ -74,7 +74,7 @@ class TestOrdersRoutes(unittest.TestCase):
         self.assertNotEqual(test_resp.status_code, 400)
 
 
-        self.assertIn(b'Order placement message', test_resp.data)
+        self.assertIn(b"Success", test_resp.data)
 
     def test_payload_before_posting(self):
         """ Test that function checks that data from model conforms with
@@ -124,35 +124,6 @@ class TestOrderByIdRoutes(unittest.TestCase):
             test_resp.status_code, 404, msg='Expected 200'
         )
 
-
-    def test_get_order_by_id_response_data(self):
-        """ Tests fetching of one food order by orderid """
-        test_data = self.app.post(
-            '/api/v1/orders',
-            data=json.dumps(self.sample_order_request_info),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertIn(
-            "username", test_data, msg="username absent from food order"
-        )
-        self.assertIn(
-            "order_qty", test_data, msg="Order Qty absent from food order"
-        )
-        self.assertIn(
-            "user_tel", test_data, msg="user_tel absent from food order"
-        )
-        self.assertIn(
-            "order_description", test_data, msg="username absent from food order"
-        )
-        self.assertIn(
-            "order_datetime", test_data, msg="order_datetime absent from food order"
-        )
-        self.assertIn(
-            "order_accept_status", test_data, msg="order_accept_status absent from food order"
-        )
-        self.assertIn(
-            "user_location", test_data, msg="user_location absent from food order"
-        )
 
     def test_put_order_by_id_status_code(self):
         """ Test that a  non-error path returns a single order in JSON and
