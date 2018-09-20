@@ -3,6 +3,7 @@
 import unittest
 from app.models import FoodOrders, FoodOrderOps
 
+
 class TestFoodOrders(unittest.TestCase):
     """ Test FoodOrders class """
     def setUp(self):
@@ -10,8 +11,10 @@ class TestFoodOrders(unittest.TestCase):
         self.sample_food_orders = FoodOrders()
         self.sample_order_request_info = {
             "username": "mrnoname",
-            "order_qty": 2,
-            "order_description": "500ml soda @Ksh. 100/="
+            "user_tel": "072716173",
+            "order_qty": "2",
+            "order_description": "500ml soda @Ksh. 100/=",
+            "user_location": "221B Baker St."
         }
 
     def test_get_returns_dict(self):
@@ -30,40 +33,17 @@ class TestFoodOrders(unittest.TestCase):
             msg="Expected custom message when food order list is empty"
         )
 
-    def test_get_returns_dict_with_correct_format_when_orders_exist(self):
-        """ Tests that returned dictionary contains expected data/info """
-        test_data = self.sample_food_orders.post(self.sample_order_request_info)
-        self.assertIn(
-            "username", test_data, msg="username absent from food order"
-        )
-        self.assertIn(
-            "order_qty", test_data, msg="Order Qty absent from food order"
-        )
-        self.assertIn(
-            "user_tel", test_data, msg="user_tel absent from food order"
-        )
-        self.assertIn(
-            "order_description", test_data, msg="username absent from food order"
-        )
-        self.assertIn(
-            "order_datetime", test_data, msg="order_datetime absent from food order"
-        )
-        self.assertIn(
-            "order_accept_status", test_data, msg="order_accept_status absent from food order"
-        )
-        self.assertIn(
-            "user_location", test_data, msg="user_location absent from food order"
-        )
-
     def test_post_only_accepts_dicts_as_input(self):
         """ Tests handling of invalid input/datatype."""
-        self.assertRaises(
-            TypeError, self.sample_food_orders.post, 1,
+        self.assertIn(
+            "Invalid Input message",
+            self.sample_food_orders.post(1),
+            msg="Agrument should be dictionary"
         )
 
     def test_post_error_msg_on_invalid_input(self):
         """
-            Tests for custom error message on method is calleed
+            Tests for custom error message on method is called
             with invalid data
         """
         self.assertIn(
@@ -81,6 +61,7 @@ class TestFoodOrders(unittest.TestCase):
 
     def tearDown(self):
         pass
+
 
 class TestFoodOrdersOps(unittest.TestCase):
     """ Test FoodOrdersOps class """
@@ -107,7 +88,7 @@ class TestFoodOrdersOps(unittest.TestCase):
             (Out of range)
         """
         self.assertDictEqual(
-            self.sample_food_orders.get(1),
+            self.sample_food_orders.get(2),
             {"Order fetching error message": "orderid out of range"},
             msg="Method does not handle out of range orders"
         )
@@ -146,7 +127,6 @@ class TestFoodOrdersOps(unittest.TestCase):
             msg="Method does not handle non-integers for orderid"
         )
 
-
     def test_put_returns_dict(self):
         """ Test that put(orderid, order_status) returns dict """
 
@@ -170,19 +150,19 @@ class TestFoodOrdersOps(unittest.TestCase):
         """
         self.assertDictEqual(
             self.sample_food_orders.put(2, True),
-            {"Order update error message": "orderid out of range"},
+            {"Order status message": "orderid out of range"},
             msg="Method does not handle out of range orders"
         )
 
         self.assertDictEqual(
             self.sample_food_orders.put(0, True),
-            {"Order update error message": "orderid out of range"},
+            {"Order status message": "orderid out of range"},
             msg="Method does not handle out of range orders"
         )
 
         self.assertDictEqual(
             self.sample_food_orders.put(-1, True),
-            {"Order update error message": "orderid out of range"},
+            {"Order status message": "orderid out of range"},
             msg="Method does not handle out of range orders"
         )
 
@@ -201,7 +181,6 @@ class TestFoodOrdersOps(unittest.TestCase):
             {"Order update error message": "Invalid Input"},
             msg="Method does not handle non-integers for orderid"
         )
-
 
 
 if __name__ == '__main__':

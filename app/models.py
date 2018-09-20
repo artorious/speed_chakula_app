@@ -18,8 +18,9 @@
 
 import datetime
 
-# GLOBAL Var to hold all food orders
-# GLobal var to hold counter
+
+ALL_FOOD_ORDERS = {}
+ORDER_COUNT = 1
 
 
 class FoodOrders():
@@ -33,7 +34,9 @@ class FoodOrders():
             Returns a dictionary with all food orders or descriptive message
             if no orders have been placed yet.
         """
-        return
+        if ALL_FOOD_ORDERS == {}:
+            return {"Dear customer": "No food orders placed yet"}
+        return ALL_FOOD_ORDERS
 
     def post(self, order_request_info):
         """ (FoodOrders, dict) -> dict
@@ -42,7 +45,27 @@ class FoodOrders():
             Returns a dictionary with descriptive message to user indicating
             opertation status, success, failure or error message
         """
-        return
+        global ALL_FOOD_ORDERS, ORDER_COUNT
+
+        if isinstance(order_request_info, dict):
+            # Expected keys in input dict
+            chklst = [
+                "username", "user_tel", "order_qty", "order_description", "user_location"
+            ]
+            # check for expected keys in input dict
+            if set([True for _ in chklst if _ in order_request_info]) == {True}:
+                order_request_info['order_datetime'] = \
+                        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                order_request_info['order_accept_status'] = False
+
+                ALL_FOOD_ORDERS[ORDER_COUNT] = order_request_info
+                ORDER_COUNT += 1
+                return {"Success": "Order placed successully"}
+
+            return {
+                "Invalid Input message": "Order placement failed ... missing information"
+            }
+        return {"Invalid Input message": "Argument should be a dictionary"}
 
 
 class FoodOrderOps():
@@ -56,7 +79,15 @@ class FoodOrderOps():
             Returns a dictionary with food order corresponding to <orderid>
             or a descriptive error message to user
         """
-        return
+        try:
+            int(order_id)
+            if order_id > 0 and order_id in ALL_FOOD_ORDERS:
+                return ALL_FOOD_ORDERS[order_id]
+            return {"Order fetching error message": "orderid out of range"}
+        except ValueError:
+            return {
+                "Order fetching error message": "orderid should be integer"
+            }
 
     def put(self, order_id, order_status):
         """ (FoodOrderOps, int, bool) -> dict
@@ -64,9 +95,16 @@ class FoodOrderOps():
             Returns a dictionary with a custom message to user to indicate
             order acceptance update Success or failure.
         """
-        return
+        if isinstance(order_id, int) and isinstance(order_status, bool):
+            if order_id in ALL_FOOD_ORDERS:
+                ALL_FOOD_ORDERS[order_id]['order_accept_status'] =\
+                    order_status
+                return {"Order status message": "Update Successful"}
+            return {"Order status message": "orderid out of range"}
+        return {
+            "Order update error message": "Invalid Input"
+            }
 
-    # TODO:
     # def patch(self, order_id, food_order_changes):
     #     """ update food order by <order_id> with <food_order_changes> """
     #     pass
