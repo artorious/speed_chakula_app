@@ -1,21 +1,22 @@
 """ Defines routes for app """
 
-from flask import request
-from flask import jsonify
-from app.models import FoodOrders, FoodOrderOps
+from flask import Blueprint, jsonify, request
+from app.api.v1.models import FoodOrders, FoodOrderOps
 from app import app
+# TODO: Blueprints
+v1_bp = Blueprint('v1_base', __name__, url_prefix='/api/v1')
 
 ALL_ORDERS = FoodOrders()
 ORDER_OPS = FoodOrderOps()
 
 
-@app.route('/api/v1/', methods=['GET'])
+@v1_bp.route('/', methods=['GET'])
 def index():
     """ Homepage. Returns welcome message """
     return jsonify("Welcome User. Speedy Chakula delivers fast-food-fast")
 
 
-@app.route('/api/v1/orders', methods=['GET', 'POST'])
+@v1_bp.route('/orders', methods=['GET', 'POST'])
 def orders():
     """ Fetch all food orders or create a new food order """
     if request.method == 'GET':
@@ -32,8 +33,8 @@ def orders():
             return jsonify(ALL_ORDERS.post(req_data))
         return jsonify('Sorry.... Order placement Failed')
 
-@app.route(
-    '/api/v1/orders/<int:orderid>', methods=['GET', 'PUT']
+@v1_bp.route(
+    '/orders/<int:orderid>', methods=['GET', 'PUT']
 )
 def order_by_id(orderid):
     """ Operate on a food order by <orderid>
