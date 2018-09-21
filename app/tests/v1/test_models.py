@@ -1,7 +1,8 @@
 """ Test cases for models.py """
 
 import unittest
-from app.models import FoodOrders, FoodOrderOps
+from app.api.v1.models import FoodOrders, FoodOrderOps
+
 
 
 class TestFoodOrders(unittest.TestCase):
