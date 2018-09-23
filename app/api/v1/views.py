@@ -3,7 +3,7 @@
 from flask import Blueprint, jsonify, request
 from app.api.v1.models import FoodOrders, FoodOrderOps
 from app import app
-# TODO: Blueprints
+
 v1_bp = Blueprint('v1_base', __name__, url_prefix='/api/v1')
 
 ALL_ORDERS = FoodOrders()

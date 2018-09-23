@@ -173,13 +173,59 @@ class TestOrderByIdRoutes(unittest.TestCase):
         """ Test that a  non-error path returns a single order in JSON and
             HTTP response code of 200 (OK)
         """
-        pass
+        self.app.post(
+            '/api/v1/orders',
+            data=json.dumps(self.sample_order_request_info),
+            headers={'content-type': 'application/json'}
+        )
+
+        test_resp = self.app.patch(
+            '/api/v1/orders/1',
+            data=json.dumps(
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            headers={'content-type': 'application/json'}
+        )
+        self.assertEqual(
+            test_resp.status_code, 200, msg='Expected 200'
+        )
+        self.assertNotEqual(
+            test_resp.status_code, 404, msg='Expected 200'
+        )
+        self.assertNotEqual(
+            test_resp.status_code, 415, msg='Expected 200'
+        )
+        self.assertNotEqual(
+            test_resp.status_code, 422, msg='Expected 200'
+        )
+        self.assertNotEqual(
+            test_resp.status_code, 400, msg='Expected 200'
+        )
+
 
     def test_patch_order_by_id_response_data(self):
         """ Test that a  non-error path deletes a single order's details
             in JSON and returns a Success message
         """
-        pass
+        self.app.post(
+            '/api/v1/orders',
+            data=json.dumps(self.sample_order_request_info),
+            headers={'content-type': 'application/json'}
+        )
+
+        test_resp = self.app.patch(
+            '/api/v1/orders/1',
+            data=json.dumps(
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            headers={'content-type': 'application/json'}
+        )
+
+        self.assertIn(
+            b"Order modification message",
+            test_resp.data,
+            msg="Does not output success msg to user"
+        )
     
     def tearDown(self):
         pass

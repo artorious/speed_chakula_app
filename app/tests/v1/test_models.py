@@ -73,7 +73,8 @@ class TestFoodOrdersOps(unittest.TestCase):
         self.sample_order_request_info = {
             "username": "mrnoname",
             "order_qty": 2,
-            "order_description": "500ml soda @Ksh. 100/="
+            "order_description": "500ml soda @Ksh. 100/=",
+            "user_location": "221B Baker St."
         }
 
     def test_get_returns_dict_of_correct_format(self):
@@ -185,23 +186,87 @@ class TestFoodOrdersOps(unittest.TestCase):
 
     def test_patch_returns_dict(self):
         """ Test that patch(orderid, order_changes) returns dict """
-        pass
+        self.assertIsInstance(
+            self.sample_food_orders.patch(
+                1,
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            dict,
+            msg='Method does not return a dict'
+        )
     
     def test_patch_returns_operational_message(self):
         """ Success or failure """
-        pass
+        self.assertIn(
+            "Order modification message",
+            self.sample_food_orders.patch(
+                1,
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            msg="Order modification message not found"
+        )
     
     def test_patch_handles_out_of_range_orderid(self):
         """ Test that out of range orderid return custom error message
             (Out of range)
         """
-        pass
+        self.assertDictEqual(
+            self.sample_food_orders.patch(
+                11,
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            {"Order modification message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.patch(
+                0,
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            {"Order modification message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.patch(
+                -1,
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            {"Order modification message": "orderid out of range"},
+            msg="Method does not handle out of range orders"
+        )
 
     def test_patch_handles_invalid_input(self):
         """ Test that invalid (non-int) orderid and or  update_status (non-bool)
             returns custom error message
         """
-        pass
+        self.assertDictEqual(
+            self.sample_food_orders.patch(
+                '1',
+                {"order_qty": 22, "user_location": "122C Spooner St."}
+            ),
+            {"Order modification error message": "Invalid Input"},
+            msg="Method does not handle non-integers for orderid"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.patch(
+                1,
+                [["order", 22], ["location", "122C Spooner St."]]
+            ),
+            {"Order modification error message": "Invalid Input"},
+            msg="Method does not handle non-integers for orderid"
+        )
+
+        self.assertDictEqual(
+            self.sample_food_orders.patch(
+                1,
+                {"order": 22, "location": "122C Spooner St."}
+            ),
+            {"Order modification error message": "Invalid Input"},
+            msg="Method does not handle non-integers for orderid"
+        )
 
 if __name__ == '__main__':
     unittest.main()
