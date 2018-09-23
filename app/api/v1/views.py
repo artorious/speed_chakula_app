@@ -21,6 +21,7 @@ def orders():
     """ Fetch all food orders or create a new food order """
     if request.method == 'GET':
         return jsonify(ALL_ORDERS.get())
+    
     elif request.method == 'POST':
         req_data = request.get_json(force=True)
         if (
@@ -34,7 +35,7 @@ def orders():
         return jsonify('Sorry.... Order placement Failed')
 
 @v1_bp.route(
-    '/orders/<int:orderid>', methods=['GET', 'PUT']
+    '/orders/<int:orderid>', methods=['GET', 'PUT', 'PATCH']
 )
 def order_by_id(orderid):
     """ Operate on a food order by <orderid>
@@ -47,6 +48,7 @@ def order_by_id(orderid):
         return jsonify(
             {"Order fetching error message": "orderid should be integer"}
         )
+    
     elif request.method == 'PUT':
         req_data = request.get_json(force=True)
 
@@ -55,3 +57,6 @@ def order_by_id(orderid):
                 ORDER_OPS.put(orderid, req_data)
             )
         return jsonify({"Order update message": "Update Failed..Invalid input"})
+    
+    elif request.method == 'PATCH':
+        return

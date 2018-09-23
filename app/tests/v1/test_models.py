@@ -183,6 +183,25 @@ class TestFoodOrdersOps(unittest.TestCase):
             msg="Method does not handle non-integers for orderid"
         )
 
+    def test_patch_returns_dict(self):
+        """ Test that patch(orderid, order_changes) returns dict """
+        pass
+    
+    def test_patch_returns_operational_message(self):
+        """ Success or failure """
+        pass
+    
+    def test_patch_handles_out_of_range_orderid(self):
+        """ Test that out of range orderid return custom error message
+            (Out of range)
+        """
+        pass
+
+    def test_patch_handles_invalid_input(self):
+        """ Test that invalid (non-int) orderid and or  update_status (non-bool)
+            returns custom error message
+        """
+        pass
 
 if __name__ == '__main__':
     unittest.main()

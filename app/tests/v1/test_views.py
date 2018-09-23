@@ -169,6 +169,18 @@ class TestOrderByIdRoutes(unittest.TestCase):
             msg="Does not output success msg to user"
         )
 
+    def test_patch_order_by_id_status_code(self):
+        """ Test that a  non-error path returns a single order in JSON and
+            HTTP response code of 200 (OK)
+        """
+        pass
+
+    def test_patch_order_by_id_response_data(self):
+        """ Test that a  non-error path deletes a single order's details
+            in JSON and returns a Success message
+        """
+        pass
+    
     def tearDown(self):
         pass
 
