@@ -107,7 +107,8 @@ class FoodOrderOps():
 
     def patch(self, order_id, order_changes):
         """ (FoodOrderOps, int, dict) -> dict
-            update food order by <order_id> with <food_order_changes> """
+            update food order by <order_id> with <food_order_changes> 
+        """
         if isinstance(order_id, int) and isinstance(order_changes, dict):
             if order_id in ALL_FOOD_ORDERS:
                 if len(

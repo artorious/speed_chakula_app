@@ -59,4 +59,10 @@ def order_by_id(orderid):
         return jsonify({"Order update message": "Update Failed..Invalid input"})
     
     elif request.method == 'PATCH':
-        return
+        req_data = request.get_json(force=True)
+
+        if isinstance(orderid, int):
+            return jsonify(ORDER_OPS.patch(orderid, req_data))
+        return jsonify(
+            {"Order modification error message": "orderid should be integer"}
+        )

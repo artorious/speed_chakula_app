@@ -202,7 +202,6 @@ class TestOrderByIdRoutes(unittest.TestCase):
             test_resp.status_code, 400, msg='Expected 200'
         )
 
-
     def test_patch_order_by_id_response_data(self):
         """ Test that a  non-error path deletes a single order's details
             in JSON and returns a Success message
