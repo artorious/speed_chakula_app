@@ -108,7 +108,20 @@ class FoodOrderOps():
     def patch(self, order_id, order_changes):
         """ (FoodOrderOps, int, dict) -> dict
             update food order by <order_id> with <food_order_changes> """
-        pass
+        if isinstance(order_id, int) and isinstance(order_changes, dict):
+            if order_id in ALL_FOOD_ORDERS:
+                if len(
+                    [True for _ in order_changes if _ in \
+                        ALL_FOOD_ORDERS[order_id]]) == len(order_changes
+                ):
+                    ALL_FOOD_ORDERS[order_id].update(order_changes)
+                    return {"Order modification message": "Update Successful"}
+                return {"Order modification error message": "Invalid Input"}
+            return {"Order modification message": "orderid out of range"}
+        return {
+            "Order modification error message": "Invalid Input"
+            }
+
 
     # def delete(self, order_id):
     #     """ delete food order by <order_id> """
