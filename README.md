@@ -13,25 +13,34 @@ A fast-Food-Fast is a food delivery service app for a restaurant
 * Retrieve a single food order
 * Update food order status
 
-[API Documentation](https://documenter.getpostman.com/view/3796196/RWaPskzj)
+### Getting Started
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-
-#### Usage
 ##### Set Install, setup and configure the development enviroment.
 
-1. Install [python3](https://www.python.org/download/releases/3.6.4/)
-2. [Pipenv & Virtual Environments](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
+1. Install and configure [python3](https://www.python.org/download/releases/3.6.4/)
+2. Install and configure [Pipenv & VirtualEnvironmentWrapper](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
 3. On a  terminal (Linux), Install and set up git `sudo apt install git` 
 4. Clone the repository `git clone https://github.com/artorious/speedy_chakula_app.git`
 5. Run `cd speedy_chakula_app/`
-6. Run `git checkout ch-API-Documentation-160534024`
+6. Run `git checkout ch-README-update-160733855`
 7. In a virutal environment, run `pipenv shell` to install requirements
-
 ##### Starting the application
 To run the application and set the envionment variable, 
-run `FLASK_APP=run.py ; flask run`
 
-##### Running tests
-Run `coverage run -m pytest -v app/tests/v1/test* ; coverage report app/tests/v1/test_*  app/api/v1/*.py `
+* run `export FLASK_APP=run.py ; export FLASK_ENV=development`
+* run`flask run`
+
+###### API Documentation
+
+* [API Documentation on postman](https://documenter.getpostman.com/view/3796196/RWaPskzj)
+
+
+###### Running tests
+
+On a terminal Run `coverage run -m pytest -v app/tests/v1/test* ; coverage report app/tests/v1/test_*  app/api/v1/*.py `
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/dbfd44a4306fe46d66a4)
+
+###### Deployment
+Visit the deployed app on [Heroku](https://speedy-chakula-api-heroku.herokuapp.com/api/v1)
