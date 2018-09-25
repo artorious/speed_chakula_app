@@ -18,7 +18,9 @@ def index():
 
 @v1_bp.route('/orders', methods=['GET', 'POST'])
 def orders():
-    """ Fetch all food orders or create a new food order """
+    """ Fetch all food orders (GET) or create a new food order (POST)
+        Returns a dictionary of food orders.
+     """
     if request.method == 'GET':
         return jsonify(ALL_ORDERS.get())
     

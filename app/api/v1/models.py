@@ -17,33 +17,61 @@
 """
 
 import datetime
-
+from flask_restful import Resource
 
 ALL_FOOD_ORDERS = {}
 ORDER_COUNT = 1
 
 
-class FoodOrders():
+class FoodOrders(Resource):
     """ Holds methods to display all and create food orders """
     def __init__(self):
         pass
 
     def get(self):
-        """ (FoodOrders) -> dict
-
-            Returns a dictionary with all food orders or descriptive message
-            if no orders have been placed yet.
+        """Fetch all Food Orders
+        
+        Returns a dictionary with all food orders or descriptive message if no orders have been placed yet.
+        ---
+        tags:
+          - Fetch all / Create a Food order
+        parameters:
+          - in: path
+            description: /api/v1/orders
+        responses:
+          200:
+            description: All available food orders
+          404:
+            description: Bad user request
         """
         if ALL_FOOD_ORDERS == {}:
             return {"Dear customer": "No food orders placed yet"}
         return ALL_FOOD_ORDERS
 
     def post(self, order_request_info):
-        """ (FoodOrders, dict) -> dict
+        """Creates a new food order with provided <order_request_info>.
+        
+        Returns a dictionary with descriptive message to user indicating
+        opertation status, success, failure or error message
 
-            Creates a new food order with provided <order_request_info>.
-            Returns a dictionary with descriptive message to user indicating
-            opertation status, success, failure or error message
+        ---
+        tags:
+          - Fetch all / Create a Food order
+        parameters:
+          - in: body
+            name: order_request_info
+            type: object
+            required: true
+        responses:
+          200:
+            description: "Success"
+          201:
+            description: "Order placed successully"
+          400:
+            description: "Bad Request"
+          404:
+            description: "Resource not found"
+            
         """
         global ALL_FOOD_ORDERS, ORDER_COUNT
 
@@ -68,16 +96,31 @@ class FoodOrders():
         return {"Invalid Input message": "Argument should be a dictionary"}
 
 
-class FoodOrderOps():
+class FoodOrderOps(Resource):
     """ Holds methods for operations on individual(by orderID) food orders """
     def __init__(self):
         pass
 
     def get(self, order_id):
-        """ (FoodOrderOps, int) -> dict
+        """ Fetch a food order by order ID
 
             Returns a dictionary with food order corresponding to <orderid>
             or a descriptive error message to user
+        
+        ---
+        tags:
+          - Operations on Food orders
+        parameters:
+          - in: path
+            name: orderid
+            description: The ID of the food order, try 1!
+            type: integer
+            required: true
+        responses:
+          200:
+            description: Requested food orders
+          404:
+            description: Bad user request
         """
         try:
             int(order_id)
@@ -90,10 +133,30 @@ class FoodOrderOps():
             }
 
     def put(self, order_id, order_status):
-        """ (FoodOrderOps, int, bool) -> dict
+        """ Change Food order status
 
             Returns a dictionary with a custom message to user to indicate
             order acceptance update Success or failure.
+        ---
+        tags:
+          - Operations on Food orders
+        parameters:
+          - in: path
+            name: orderid
+            required: true
+            description: The ID of the Food ordertask, try 1!
+            type: integer
+          - in: body
+            name: order_status
+            type: boolean
+            required: true
+        responses:
+          200:
+            description: "Order status updated succesfully"
+          400:
+            description: "Bad Request"
+          404:
+            description: "Resource not found"
         """
         if isinstance(order_id, int) and isinstance(order_status, bool):
             if order_id in ALL_FOOD_ORDERS:
