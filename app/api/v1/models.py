@@ -35,9 +35,6 @@ class FoodOrders(Resource):
         ---
         tags:
           - Fetch all / Create a Food order
-        parameters:
-          - in: path
-            description: /api/v1/orders
         responses:
           200:
             description: All available food orders
@@ -62,6 +59,7 @@ class FoodOrders(Resource):
             name: order_request_info
             type: object
             required: true
+            description: Dictionary containing food order details
         responses:
           200:
             description: "Success"
@@ -104,9 +102,8 @@ class FoodOrderOps(Resource):
     def get(self, order_id):
         """ Fetch a food order by order ID
 
-            Returns a dictionary with food order corresponding to <orderid>
-            or a descriptive error message to user
-        
+        Returns a dictionary with food order corresponding to <orderid>
+        or a descriptive error message to user  
         ---
         tags:
           - Operations on Food orders
@@ -185,11 +182,6 @@ class FoodOrderOps(Resource):
         return {
             "Order modification error message": "Invalid Input"
             }
-
-
-    # def delete(self, order_id):
-    #     """ delete food order by <order_id> """
-    #     pass
 
 
 if __name__ == '__main__':
