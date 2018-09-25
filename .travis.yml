@@ -1,0 +1,13 @@
+
+language: python
+python:
+    - "3.6"
+
+# Command to install dependancies
+install: "make"
+
+# command to run tests
+script:
+    - coverage run --source app/tests/ -m pytest
+after_success:
+    - coveralls

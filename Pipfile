@@ -11,6 +11,11 @@ pytest = "*"
 pytest-cache = "*"
 "pytest-pep8" = "*"
 flask = "*"
+coverage = "*"
+coveralls = "*"
+gunicorn = "*"
+python-dotenv = "*"
+"psycopg2" = "*"
 
 [dev-packages]
 
