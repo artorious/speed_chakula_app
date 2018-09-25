@@ -16,6 +16,8 @@ coveralls = "*"
 gunicorn = "*"
 python-dotenv = "*"
 "psycopg2" = "*"
+setuptools = "*"
+flasgger = "*"
 
 [dev-packages]
 
