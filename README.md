@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/artorious/speedy_chakula_app.svg?branch=ch-improve-config-settings-160485668)](https://travis-ci.com/artorious/speedy_chakula_app) 
-[![Coverage Status](https://coveralls.io/repos/github/artorious/speedy_chakula_app/badge.svg?branch=ch-improve-config-settings-160485668)](https://coveralls.io/github/artorious/speedy_chakula_app?branch=ch-improve-config-settings-160485668) 
-[![Maintainability](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability)](https://codeclimate.com/github/codeclimate/codeclimate/maintainability)
+[![Coverage Status](https://coveralls.io/repos/github/artorious/speedy_chakula_app/badge.svg?branch=develop)](https://coveralls.io/github/artorious/speedy_chakula_app?branch=develop)
+[![Maintainability](https://api.codeclimate.com/v1/badges/a198b1caf23489ac1f6d/maintainability)](https://codeclimate.com/github/artorious/speedy_chakula_app/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/test_coverage)](https://codeclimate.com/github/codeclimate/codeclimate/test_coverage) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -31,11 +31,17 @@ To run the application and set the envionment variable,
 * run `export FLASK_APP=run.py ; export FLASK_ENV=development`
 * run`flask run`
 
-###### API Documentation
+###### API Documentation and Endpoints
 
 * [API Documentation on postman](https://documenter.getpostman.com/view/3796196/RWaPskzj)
 
-
+Method | Endpoint | Functionality
+--- | --- | ---
+GET | /api/v1/orders | Fetches all existing food orders
+GET | api/v1/orders/<orderid> | Fetches a specific food order
+POST | api/v1/orders | Creates a new food order
+PUT  | api/v1/orders/<orderid> | Updates the status of a food order
+  
 ###### Running tests
 
 On a terminal Run `coverage run -m pytest -v app/tests/v1/test* ; coverage report app/tests/v1/test_*  app/api/v1/*.py `
