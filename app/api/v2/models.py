@@ -117,16 +117,13 @@ def create_all_tables():
     create_food_orders_table()
     save_database()
     close_database()
-    print('Tables created successfully!')
-
-
 
 class SignUp(Resource):
     """ Holds method to register a new user """
-    def __init__(self, username, name, email, password, admin=False):
-        self.raw_email = email
-        self.raw_password = password
-        self.raw_username = username
+    def __init__(self, user_reg_info, admin=False):
+        self.raw_email = user_reg_info['email']
+        self.raw_password = user_reg_info['password']
+        self.raw_username = user_reg_info['username']
         self.admin = admin
         self.hashed_password = None
         self.verified_username = None
@@ -134,7 +131,7 @@ class SignUp(Resource):
         self.verified_email = None
 
     
-    def post(self):
+    def post(self, verified_reg_info):
         """ Save user to DB or return msg to user      
         """
         pass
@@ -162,7 +159,7 @@ class SignUp(Resource):
     def auth_token_encoding(self, verified_username):
         """ Generate Authentication Token """
         pass
-        
+
 
     
 
