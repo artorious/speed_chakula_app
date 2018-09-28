@@ -64,7 +64,7 @@ class TestSignUpRoute(unittest.TestCase):
 
     def test_post_orders_status_code(self):
         """ Test that valid path and data for successful user creation
-            returns HTTP status 201 and a custom message to indicate success
+            returns HTTP status 201 
         """
         test_resp = self.app.post(
             '/api/v2/auth/signup',
@@ -75,7 +75,19 @@ class TestSignUpRoute(unittest.TestCase):
         self.assertNotEqual(test_resp.status_code, 405)
         self.assertNotEqual(test_resp.status_code, 404)
         self.assertNotEqual(test_resp.status_code, 400)
-        self.assertIn(b"Success", test_resp.data)
+        self.assertIn(b"Successfully registered", test_resp.data)
 
-
-    
+    def test_post_orders_operational_message(self):
+        """ Test that valid path and data for successful user creation
+            returns a custom message to indicate success a valid auth token and content type
+        """
+        test_resp = self.app.post(
+            '/api/v2/auth/signup',
+            data=json.dumps(self.sample_reg_info),
+            headers={'content-type': 'application/json'}
+        )
+        data = json.loads(test_resp.data.decode())
+        self.assertTrue(data['status'] == 'success')
+        self.assertTrue(data['message'] == 'Successfully registered')
+        self.assertTrue(data['auth_token'])
+        self.assertTrue(test_resp.content_type == 'application/json')

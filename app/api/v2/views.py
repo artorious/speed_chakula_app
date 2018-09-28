@@ -12,7 +12,8 @@ def index():
     """ Homepage. Returns welcome message """
     return 
 
-@v2_auth_bp.route('/signup', methods=['GET'])
+@v2_auth_bp.route('/signup', methods=['POST'])
 def signup():
     """ Register new user """
-    pass
+    post_data = request.get_json(force=True)
+    

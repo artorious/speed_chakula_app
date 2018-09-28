@@ -23,11 +23,9 @@ from app.api.v1 import views as views_v1
 from app.api.v2 import views as views_v2
 
 # Register Blueprints
-""" Test cases for views.py """
-
-import unittest
-import json
-from app import app
+app.register_blueprint(views_v1.v1_bp)
+app.register_blueprint(views_v2.v2_base_bp)
+app.register_blueprint(views_v2.v2_auth_bp)
 
 # Add API resources
 api.add_resource(FoodOrders, '/orders')

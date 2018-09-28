@@ -19,7 +19,7 @@ class TestSignUp(unittest.TestCase):
 
         self.sample_reg_info_bad_email = {
             'username': 'mrnoname',
-            'email': 'mrnoname#email.com',
+            'email': 'mrnoname#@email.com',
             'password': 'elephantman',
             'name': 'Arthur Ngondo',
         }
@@ -46,8 +46,15 @@ class TestSignUp(unittest.TestCase):
     def test_password_check(self):
         self.assertIn(
             "Password Error",
-            SignUp(self.sample_reg_info),
+            SignUp(self.sample_reg_info_bad_password),
             msg="Invalid password"
+        )
+    
+    def test_email_check(self):
+        self.assertIn(
+            "Email Error",
+            SignUp(self.sample_reg_info_bad_email),
+            msg="Invalid email"
         )
     
     def test_gen_passwd_hash(self):
@@ -70,3 +77,13 @@ class TestSignUp(unittest.TestCase):
         sample_user = SignUp(self.sample_reg_info)
         auth_token = sample_user.auth_token_encoding(sample_user.verified_username)
         self.assertTrue(isinstance(auth_token, bytes))
+
+    def test_auth_token_decoding(self):
+        sample_user = SignUp(self.sample_reg_info)
+        auth_token = sample_user.auth_token_encoding(
+            sample_user.verified_username
+        )
+        self.assertTrue(isinstance(auth_token, bytes))
+        self.assertTrue(
+            sample_user.auth_token_decoding(auth_token) == 'mrnoname'
+        )
