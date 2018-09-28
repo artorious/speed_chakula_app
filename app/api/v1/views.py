@@ -2,7 +2,6 @@
 
 from flask import Blueprint, jsonify, request
 from app.api.v1.models import FoodOrders, FoodOrderOps
-from app import app
 
 v1_bp = Blueprint('v1_base', __name__, url_prefix='/api/v1')
 
@@ -22,8 +21,7 @@ def orders():
         Returns a dictionary of food orders.
      """
     if request.method == 'GET':
-        return jsonify(ALL_ORDERS.get())
-    
+        msg_out = jsonify(ALL_ORDERS.get())
     elif request.method == 'POST':
         req_data = request.get_json(force=True)
         if (
@@ -33,8 +31,11 @@ def orders():
                 'order_description' in req_data and
                 'user_location' in req_data
         ):
-            return jsonify(ALL_ORDERS.post(req_data))
-        return jsonify('Sorry.... Order placement Failed')
+            msg_out = jsonify(ALL_ORDERS.post(req_data))
+        else:
+            msg_out = jsonify('Sorry.... Order placement Failed')
+    return msg_out
+
 
 @v1_bp.route(
     '/orders/<int:orderid>', methods=['GET', 'PUT', 'PATCH']
@@ -46,25 +47,19 @@ def order_by_id(orderid):
     """
     if request.method == 'GET':
         if isinstance(orderid, int):
-            return jsonify(ORDER_OPS.get(orderid))
-        return jsonify(
-            {"Order fetching error message": "orderid should be integer"}
-        )
-    
+            msg_out = jsonify(ORDER_OPS.get(orderid))
+        else:
+            msg_out = jsonify(
+                {"Order fetching error message": "orderid should be integer"}
+            )
     elif request.method == 'PUT':
         req_data = request.get_json(force=True)
-
         if isinstance(orderid, int) and isinstance(req_data, bool):
-            return jsonify(
+            msg_out = jsonify(
                 ORDER_OPS.put(orderid, req_data)
             )
-        return jsonify({"Order update message": "Update Failed..Invalid input"})
-    
-    elif request.method == 'PATCH':
-        req_data = request.get_json(force=True)
-
-        if isinstance(orderid, int):
-            return jsonify(ORDER_OPS.patch(orderid, req_data))
-        return jsonify(
-            {"Order modification error message": "orderid should be integer"}
-        )
+        else:
+            msg_out = jsonify(
+                {"Order update message": "Update Failed..Invalid input"}
+            )
+    return msg_out
