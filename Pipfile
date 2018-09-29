@@ -17,7 +17,6 @@ gunicorn = "*"
 python-dotenv = "*"
 setuptools = "*"
 flasgger = "*"
-flask-restful = "*"
 "psycopg2-binary" = "*"
 "psycopg2" = "*"
 
