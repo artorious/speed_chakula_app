@@ -1,28 +1,19 @@
-""" Initialization file """
+""" Initialization file - App factory"""
 import os
 from flask import Flask
 from flasgger import Swagger
-from flask_restful import Api, Resource
 from app.api.v1.models import FoodOrders, FoodOrderOps
+from instance.config import app_config
 
 
-# Init the app
-app = Flask(__name__, instance_relative_config=True)
-api = Api(app)
 
-# Documentation
-swagger = Swagger(app)
+def create_app(config_mode):
+    """ Init the app """
+    app = Flask(__name__, instance_relative_config=True)
+    swagger = Swagger(app)  # Documentation
+    app.config.from_object(app_config[config_mode])
+    app.config.from_pyfile('config.py')  # config file
+    from app.api.v1 import views  # load views
+    app.register_blueprint(views.v1_bp)  # Register Blueprints
 
-# Load the config file
-app.config.from_object('instance.config')
-
-
-# load views
-from app.api.v1 import views
-
-# Register Blueprints
-app.register_blueprint(views.v1_bp)
-
-# Add API resources
-api.add_resource(FoodOrders, '/orders')
-api.add_resource(FoodOrderOps, '/orders/<orderid>')
+    return app

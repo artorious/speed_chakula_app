@@ -2,13 +2,14 @@
 
 import unittest
 import json
-from app import app
+from app import create_app
 
 class TestHomePage(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode="development")
+        self.app = self.app.test_client()
 
     def test_index_status_code(self):
         """Test for home page data"""
@@ -36,7 +37,8 @@ class TestOrdersRoutes(unittest.TestCase):
     """ Test routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode="development")
+        self.app = self.app.test_client()
         self.sample_order_request_info = {
             'username': 'mrnoname',
             'user_tel': '0727161173',
@@ -45,7 +47,7 @@ class TestOrdersRoutes(unittest.TestCase):
             'user_location': '221B Baker st.'
         }
 
-    def test_get_orders_status_code(self):
+    def test_get_orders_success(self):
         """ Test that a valid path that returns HTTP response code of 200(OK)
         """
         test_resp = self.app.get(
@@ -58,7 +60,9 @@ class TestOrdersRoutes(unittest.TestCase):
         self.assertNotEqual(
             test_resp.status_code, 404, msg='Expected 200'
         )
-
+        self.assertTrue(test_resp.content_type == 'application/json')
+        
+        
     def test_post_orders_status_code(self):
         """ Test that valid path and data for successful order creation
             returns HTTP status 201 and a custom message to indicate success
@@ -72,8 +76,6 @@ class TestOrdersRoutes(unittest.TestCase):
         self.assertNotEqual(test_resp.status_code, 405)
         self.assertNotEqual(test_resp.status_code, 404)
         self.assertNotEqual(test_resp.status_code, 400)
-
-
         self.assertIn(b"Success", test_resp.data)
 
     def test_payload_before_posting(self):
@@ -94,7 +96,8 @@ class TestOrderByIdRoutes(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode="development")
+        self.app = self.app.test_client()
         self.sample_order_request_info = {
             'username': 'mrnoname',
             'user_tel': '0727161173',

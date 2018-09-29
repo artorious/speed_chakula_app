@@ -1,4 +1,14 @@
 """ Project configuration variables """
-# Enable Debugging
+import os
 
-DEBUG = True
+class Config():
+    """ General Config. """
+    DEBUG = False
+    SECRET = os.getenv('SECRET')
+
+class DevConfig(Config):
+    """ Development Config. """
+    DEBUG = True
+    
+
+app_config = {'development': DevConfig}
