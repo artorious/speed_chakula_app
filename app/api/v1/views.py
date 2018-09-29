@@ -11,7 +11,16 @@ ORDER_OPS = FoodOrderOps()
 
 @v1_bp.route('/', methods=['GET'])
 def index():
-    """ Homepage. Returns welcome message """
+    """ Homepage. Returns welcome message 
+    ---
+        tags:
+          - Home page
+        responses:
+          200:
+            description: Success
+          404:
+            description: Bad user request
+    """
     return jsonify("Welcome User. Speedy Chakula delivers fast-food-fast")
 
 
@@ -29,12 +38,13 @@ def fetch():
      """
     return jsonify(ALL_ORDERS.get())
 
+
 @v1_bp.route('/orders', methods=['POST'])
 def create():
     """ Create a new food order.
     ---
         tags:
-          - Fetch all / Create a Food order
+          -Create a Food order
         parameters:
           - in: body
             name: order_request_info
@@ -134,4 +144,5 @@ def change_order_status(orderid):
             {"Order update message": "Update Failed..Invalid input"}
         )
     return msg_out
+
 

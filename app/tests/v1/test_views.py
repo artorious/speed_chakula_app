@@ -29,7 +29,16 @@ class TestHomePage(unittest.TestCase):
         )
 
         self.assertIn(b"Welcome User", test_resp.data, msg="Homepage message")
-
+    
+    def test_index_handles_404(self):
+        """ Page not found handling """
+        "Sorry... The page youa are looking for does not exist"
+        test_resp = self.app.get(
+            '/api/v1/t',
+            headers={'content-type': 'application/json'}
+        )
+        self.assertIn(b"Sorry...", test_resp.data, msg="Homepage not found message")
+        
     def tearDown(self):
         pass
 
