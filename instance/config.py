@@ -1,8 +1,4 @@
 """ Project configuration variables """
-# Enable Debugging
-
-DEBUG = True
-""" Project configuration variables """
 import os
 
 class Config():
