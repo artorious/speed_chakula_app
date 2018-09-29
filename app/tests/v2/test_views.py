@@ -2,15 +2,16 @@
 
 import unittest
 import json
-from app import app
-from app.api.v2.models import create_all_tables
+from app import create_app
+from app.api.v2.models import SignUp
 
 
 class TestHomePage(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode='testing')
+        self.app = self.app.test_client()
 
     def test_index_status_code(self):
         """Test for home page data"""
@@ -37,7 +38,8 @@ class TestSignUpRoute(unittest.TestCase):
     """ Test route to register new user """
     def setUp(self):
         """ Instantiate test client with data """
-        self.app = app.test_client()
+        self.app = create_app(config_mode='testing')
+        self.app = self.app.test_client()
         self.sample_reg_info = {
             'username': 'mrnoname',
             'email': 'mrnoname@email.com',

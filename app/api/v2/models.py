@@ -5,120 +5,138 @@ import sys
 import datetime
 import psycopg2
 import bcrypt
-from flask_restful import Resource
 
 
 
-CONN = None
+class DatabaseManger():
+    """ Database methods """
+    def __init__(self, config_mode=None):
+        self.conn = None
+        self.config_mode = config_mode
+        self.user = os.getenv("DATABASE_USERENAME")
+        self.db_name = os.getenv("DATABASE_NAME")
+        self.test_db_name = os.getenv("TEST_DATABASE_NAME")
+        self.password = os.getenv("DATABASE_PWD")
+        self.host = os.getenv("DATABASE_HOST")
+        self.port = os.getenv("DATABASE_PORT")
 
-USER = os.getenv("DATABASE_USERENAME")
-DBNAME = os.getenv("DATABASE_NAME")
-HOST = os.getenv("DATABASE_HOST")
-PORT = os.getenv("DATABASE_PORT")
-PASSWORD = os.getenv("DATABASE_PWD")
+    def connect_to_db(self):
+        """ Create connection to database and return cursor """
+        if self.config_mode == 'testing':
+            dbname = self.test_db_name
+        else:
+            dbname = self.db_name
 
-try:
-    # Connection
-    CONN = psycopg2.connect(
-        dbname=DBNAME,
-        user=USER,
-        host=HOST,
-        password=PASSWORD
-    )
-    CUR = CONN.cursor()
-except Exception as err:
-    print('An Error Occured: {}'.format(err))
+        password = self.password
+        user = self.user
+        host = self.host
+        port = self.port
 
-
-def create_users_table():
-    """ Creates a table that hold user information """
-    try:
-        CUR.execute("DROP TABLE IF EXISTS users CASCADE")
-        CUR.execute(
-            "CREATE TABLE users (\
-                userid SERIAL PRIMARY KEY, \
-                name VARCHAR(50) NOT NULL, \
-                password VARCHAR NOT NULL, \
-                email VARCHAR(50) NOT NULL, \
-                username VARCHAR(25) NOT NULL,\
-                admin_priviledges bool NOT NULL,\
-                login_status bool NOT NULL, \
-                registration_datetime TIMESTAMPTZ NOT NULL \
-                );"
+        try:
+            self.conn = psycopg2.connect(
+                dbname=dbname,
+                user=user,
+                host=host,
+                port=port,
+                password=password
             )
-        CONN.commit()
-    except psycopg2.DatabaseError as err:
-        if CONN:
-            CONN.rollback()
-        print('An Error Occured: {}'.format(err))
-        sys.exit(1)
+            output = self.conn.cursor()
+        except Exception as err:
+            output = None
+            print('An Error Occured: {}'.format(err))
+
+        return output
+
+    def create_users_table(self):
+        """ Creates a table that hold user information """
+        try:
+            curs = self.connect_to_db()
+            curs.execute("DROP TABLE IF EXISTS users CASCADE")
+            curs.execute(
+                "CREATE TABLE users (\
+                    userid SERIAL PRIMARY KEY, \
+                    username VARCHAR(25) NOT NULL,\
+                    name VARCHAR(50) NOT NULL, \
+                    email VARCHAR(50) NOT NULL, \
+                    admin_priviledges bool NOT NULL,\
+                    login_status bool NOT NULL, \
+                    reg_datetime TIMESTAMPTZ NOT NULL, \
+                    password VARCHAR NOT NULL \
+                    );"
+                )
+            self.conn.commit()
+
+        except psycopg2.DatabaseError as err:
+            if self.conn:
+                self.conn.rollback()
+            print('An Error Occured: {}'.format(err))
+            sys.exit(1)
+
+    def create_food_menu_table(self):
+        """ Creates a table that holds all available menu/food items """
+        try:
+            curs = self.connect_to_db()
+            curs.execute("DROP TABLE IF EXISTS menu CASCADE")
+            curs.execute(
+                "CREATE TABLE menu (\
+                    foodid SERIAL PRIMARY KEY, \
+                    userid INT NOT NULL REFERENCES users(userid), \
+                    unit_price INT NOT NULL, \
+                    description VARCHAR(100) NOT NULL\
+                    );"
+                )
+            self.conn.commit()
+        except psycopg2.DatabaseError as err:
+            if self.conn:
+                self.conn.rollback()
+            print('An Error Occured: {}'.format(err))
+            sys.exit(1)
+
+    def create_food_orders_table(self):
+        """ Creates table that holds all food orders from users """
+        try:
+            curs = self.connect_to_db()
+            curs.execute("DROP TABLE IF EXISTS orders CASCADE")
+            curs.execute(
+                "CREATE TABLE orders (\
+                    orderid SERIAL PRIMARY KEY, \
+                    userid INT NOT NULL REFERENCES users(userid), \
+                    order_date DATE NOT NULL DEFAULT CURRENT_DATE, \
+                    order_cost INT NOT NULL, \
+                    orderstatus VARCHAR(15) NOT NULL, \
+                    deliverylocation VARCHAR(50) NOT NULL, \
+                    orderDescription VARCHAR(100) NOT NULL\
+                    );"
+                )
+            self.conn.commit()
+        except psycopg2.DatabaseError as err:
+            if self.conn:
+                self.conn.rollback()
+            print('An Error Occured: {}'.format(err))
+            sys.exit(1)
+
+    def close_database(self):
+        """ Closes database connection """
+        if self.conn:
+            self.conn.close()
+
+    def save_database(self):
+        """ Saves database's current state """
+        if self.conn:
+            self.conn.commit()
+
+    def create_all_tables(self):
+        """ Create users, menu and orders tables """
+        self.create_users_table()
+        self.create_food_menu_table()
+        self.create_food_orders_table()
+        self.save_database()
+        self.close_database()
+        print('Tables created successfully!')
 
 
-def create_food_menu_table():
-    """ Creates a table that holds all available menu/food items """
-    try:
-        CUR.execute("DROP TABLE IF EXISTS menu CASCADE")
-        CUR.execute(
-            "CREATE TABLE menu (\
-                foodid SERIAL PRIMARY KEY, \
-                userid INT NOT NULL REFERENCES users(userid), \
-                unit_price INT NOT NULL, \
-                description VARCHAR(100) NOT NULL, \
-                datetime_added TIMESTAMPTZ NOT NULL \
-                );"
-            )
-        CONN.commit()
-    except psycopg2.DatabaseError as err:
-        if CONN:
-            CONN.rollback()
-        print('An Error Occured: {}'.format(err))
-        sys.exit(1)
 
-
-def create_food_orders_table():
-    """ Creates table that holds all food orders from users """
-    try:
-        CUR.execute("DROP TABLE IF EXISTS orders CASCADE")
-        CUR.execute(
-            "CREATE TABLE orders (\
-                orderid SERIAL PRIMARY KEY, \
-                userid INT NOT NULL REFERENCES users(userid), \
-                order_cost INT NOT NULL, \
-                orderstatus VARCHAR(15) NOT NULL, \
-                deliverylocation VARCHAR(50) NOT NULL, \
-                orderDescription VARCHAR(100) NOT NULL, \
-                order_datetime TIMESTAMPTZ NOT NULL \
-                );"
-            )
-        CONN.commit()
-    except psycopg2.DatabaseError as err:
-        if CONN:
-            CONN.rollback()
-        print('An Error Occured: {}'.format(err))
-        sys.exit(1)
-
-
-def close_database():
-    """ Closes database connection """
-    if CONN:
-        CONN.close()
-
-
-def save_database():
-    """ Saves database's current state """
-    if CONN:
-        CONN.commit()
-
-
-def create_all_tables():
-    """ Create users, menu and orders tables """
-    create_users_table()
-    create_food_menu_table()
-    create_food_orders_table()
-    save_database()
-    close_database()
-
-class SignUp(Resource):
+class SignUp():
     """ Holds method to register a new user """
     def __init__(self, user_reg_info, admin=False):
         self.raw_email = user_reg_info['email']
@@ -162,6 +180,8 @@ class SignUp(Resource):
 
 
     
-
 if __name__ == '__main__':
+    # test_db_inst = DatabaseManger('testing')
+    # test_db_inst = DatabaseManger()
+    # test_db_inst.create_all_tables()
     pass
