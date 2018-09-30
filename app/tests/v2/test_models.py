@@ -2,14 +2,16 @@
 
 import unittest
 import bcrypt
-from app.api.v2.models import SignUp
+from app.api.v2.models import DatabaseManager, UserOps
 
 
-class TestSignUp(unittest.TestCase):
+class TestUserOps(unittest.TestCase):
     """ Test user registration """
     def setUp(self):
         """ Define test vars """
-
+        # self.app = create_app(config_mode="development")
+        test_db = DatabaseManager(config_mode='testing')
+        
         self.sample_reg_info = {
             'username': 'mrnoname',
             'email': 'mrnoname@email.com',
@@ -31,29 +33,35 @@ class TestSignUp(unittest.TestCase):
             'name': 'Arthur Ngondo',
         }
         
-        self.sample_user = SignUp(self.sample_reg_info)
+        self.sample_user = UserOps(self.sample_reg_info)
+        self.sample_user2 = UserOps(self.sample_reg_info_bad_email)
+        self.sample_user3 = UserOps(self.sample_reg_info_bad_password)
 
     def tearDown(self):
         pass
     
     def test_username_check(self):
+        """ Test that a username does not exist before registration"""
+        sample_user2 = UserOps(self.sample_reg_info)
         self.assertIn(
             "Username Error",
-            SignUp(self.sample_reg_info),
+            sample_user2,
             msg="Taken Username"
         )
     
     def test_password_check(self):
+        sample_user2 = UserOps(self.sample_reg_info_bad_password)
         self.assertIn(
             "Password Error",
-            SignUp(self.sample_reg_info_bad_password),
+            sample_user2,
             msg="Invalid password"
         )
     
     def test_email_check(self):
+        
         self.assertIn(
             "Email Error",
-            SignUp(self.sample_reg_info_bad_email),
+            self.sample_user2.email_check(),
             msg="Invalid email"
         )
     
@@ -74,16 +82,12 @@ class TestSignUp(unittest.TestCase):
         )
     
     def test_auth_token_encoding(self):
-        sample_user = SignUp(self.sample_reg_info)
-        auth_token = sample_user.auth_token_encoding(sample_user.verified_username)
+        auth_token = self.sample_user.auth_token_encoding(self.sample_user.verified_username)
         self.assertTrue(isinstance(auth_token, bytes))
 
     def test_auth_token_decoding(self):
-        sample_user = SignUp(self.sample_reg_info)
-        auth_token = sample_user.auth_token_encoding(
-            sample_user.verified_username
-        )
+        auth_token = self.sample_user.auth_token_encoding(self.sample_user.verified_username)
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(
-            sample_user.auth_token_decoding(auth_token) == 'mrnoname'
+            self.sample_user.auth_token_decoding(auth_token) == self.sample_user.encoded_token
         )

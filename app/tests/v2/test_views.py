@@ -2,15 +2,16 @@
 
 import unittest
 import json
-from app import app
-from app.api.v2.models import create_all_tables
+from app import create_app
+from app.api.v2.models import DatabaseManager, UserOps
 
 
 class TestHomePage(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode='testing')
+        self.app = self.app.test_client()
 
     def test_index_status_code(self):
         """Test for home page data"""
@@ -33,20 +34,20 @@ class TestHomePage(unittest.TestCase):
 
     
 
-class TestSignUpRoute(unittest.TestCase):
+class TestUserOpsRoute(unittest.TestCase):
     """ Test route to register new user """
     def setUp(self):
         """ Instantiate test client with data """
-        self.app = app.test_client()
+        self.app = create_app(config_mode='testing')
+        self.app = self.app.test_client()
         self.sample_reg_info = {
-            'username': 'mrnoname',
+            'username': 'mrnonamee',
             'email': 'mrnoname@email.com',
             'password': 'elephantman',
             'name': 'Arthur Ngondo',
         }
 
-        with self.app.app_context():
-            create_all_tables()
+        # DatabaseManger.create_all_tables()
          
     def tearDown(self):
         pass
@@ -60,7 +61,7 @@ class TestSignUpRoute(unittest.TestCase):
             data=json.dumps('I want to register'),
             headers={'content-type': 'application/json'}
         )
-        self.assertIn(b'Sorry.... user registration Failed', test_resp.data)
+        self.assertIn(b"Sorry.... the provided data is malformed", test_resp.data)
 
     def test_post_orders_status_code(self):
         """ Test that valid path and data for successful user creation
@@ -87,7 +88,8 @@ class TestSignUpRoute(unittest.TestCase):
             headers={'content-type': 'application/json'}
         )
         data = json.loads(test_resp.data.decode())
-        self.assertTrue(data['status'] == 'success')
-        self.assertTrue(data['message'] == 'Successfully registered')
-        self.assertTrue(data['auth_token'])
+        self.assertTrue(data["Status"] == "Success")
+        self.assertTrue(data["Message"] == "Registration successful")
+        self.assertTrue(data["Authentication token"])
         self.assertTrue(test_resp.content_type == 'application/json')
+
