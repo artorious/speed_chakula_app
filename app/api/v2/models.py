@@ -312,10 +312,29 @@ class UserLogs(UserOps, DatabaseManager):
         self.login_status = False
         
     def fetch_and_verify_user_login(self):
-        """ Fetch user matching login details. 
-            Returns True for registered users, else False
-        """
-        return
+        """ Fetch user matching login details """
+           
+        try:
+            cur = super().connect_to_db()
+            cur.execute(
+                    "SELECT * from users WHERE username LIKE '%s';", (self.raw_username) 
+                )
+            user_details = cur.fetchone()
+            if bcrypt.hashpw(
+                    self.raw_password,bcrypt.gensalt()
+                ).decode() in user_details[7]:
+                msg_out = True
+                self.login_status = True
+            elif user_details == None:
+                msg_out = False
+
+            return msg_out
+
+        except psycopg2.DatabaseError as err:
+            super().db_error_handle(err)
+        
+        finally:
+            super().close_database()
 
 
 if __name__ == '__main__':
