@@ -13,6 +13,7 @@ def index():
     """ Homepage. Returns welcome message """
     return jsonify("Welcome User. Speedy Chakula delivers fast-food-fast")
 
+
 @v2_auth_bp.route('/signup', methods=['POST'])
 def signup():
     """ Register new user """
@@ -72,4 +73,8 @@ def signup():
         return jsonify(msg_out)
 
 
-    
+@v2_auth_bp.route('/login', methods=['POST'])
+def login():
+    """ User Login """
+    return 
+  
