@@ -5,60 +5,57 @@ import bcrypt
 from app.api.v2.models import DatabaseManager, UserOps
 
 
-class TestUserOps(unittest.TestCase):
-    """ Test user registration """
+class BaseTestCase(unittest.TestCase):
+    """ Base Tests """
     def setUp(self):
-        """ Define test vars """
-        # self.app = create_app(config_mode="development")
-        test_db = DatabaseManager(config_mode='testing')
-        
         self.sample_reg_info = {
-            'username': 'mrnoname',
-            'email': 'mrnoname@email.com',
-            'password': 'elephantman',
-            'name': 'Arthur Ngondo',
+            'username': 'shelockholmes',
+            'email': 'consultingdetective@email.com',
+            'password': 'theelephantman',
+            'name': 'Arthur Ngondo'
         }
-
         self.sample_reg_info_bad_email = {
             'username': 'mrnoname',
             'email': 'mrnoname#@email.com',
             'password': 'elephantman',
-            'name': 'Arthur Ngondo',
+            'name': 'Arthur Ngondo'
         }
 
         self.sample_reg_info_bad_password = {
             'username': 'mrnoname',
             'email': 'mrnoname@email.com',
             'password': 'passwd',
-            'name': 'Arthur Ngondo',
+            'name': 'Arthur Ngondo'
         }
-        
+        self.test_database = DatabaseManager(config_mode='testing')
+        self.test_database.create_all_tables()
         self.sample_user = UserOps(self.sample_reg_info)
         self.sample_user2 = UserOps(self.sample_reg_info_bad_email)
         self.sample_user3 = UserOps(self.sample_reg_info_bad_password)
 
     def tearDown(self):
-        pass
-    
+        self.test_database.drop_all_tables()
+        self.test_database.close_database()
+
+class TestUserOps(BaseTestCase):
+    """ Test user registration """
+
     def test_username_check(self):
         """ Test that a username does not exist before registration"""
-        sample_user2 = UserOps(self.sample_reg_info)
         self.assertIn(
             "Username Error",
-            sample_user2,
+            self.sample_user2,
             msg="Taken Username"
         )
     
     def test_password_check(self):
-        sample_user2 = UserOps(self.sample_reg_info_bad_password)
         self.assertIn(
             "Password Error",
-            sample_user2,
+            self.sample_user2,
             msg="Invalid password"
         )
     
     def test_email_check(self):
-        
         self.assertIn(
             "Email Error",
             self.sample_user2.email_check(),
@@ -66,7 +63,7 @@ class TestUserOps(unittest.TestCase):
         )
     
     def test_gen_passwd_hash(self):
-        tester = bcrypt.hashpw('elephantman', bcrypt.gensalt())
+        tester = bcrypt.hashpw('theelephantman', bcrypt.gensalt())
         self.assertEqual(
             tester, 
             self.sample_user.hashed_password,

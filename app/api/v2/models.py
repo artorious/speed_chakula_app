@@ -3,8 +3,8 @@
 import os
 import sys
 import datetime
-import pytz
 import re
+import pytz
 import psycopg2
 import bcrypt
 import jwt
@@ -22,6 +22,7 @@ class DatabaseManager():
         self.password = os.getenv("DATABASE_PWD")
         self.host = os.getenv("DATABASE_HOST")
         self.port = os.getenv("DATABASE_PORT")
+
 
     def connect_to_db(self):
         """ Create connection to database and return cursor """
@@ -137,20 +138,33 @@ class DatabaseManager():
         self.close_database()
         print('Tables created successfully!')
 
+
+
     def db_error_handle(self, error):
         """ Roll back Transaction and exit incase of error """
         if self.conn:
             self.conn.rollback()
             print('An Error Occured: {}'.format(error))
             sys.exit(1)
-               
 
+    def drop_all_tables(self):
+        """ Drops all tables """
+        try:
+            curs = self.connect_to_db()
+            curs.execute("DROP TABLE IF EXISTS users CASCADE")
+            curs.execute("DROP TABLE IF EXISTS menu CASCADE")
+            curs.execute("DROP TABLE IF EXISTS orders CASCADE")
+            self.conn.commit()
+        except psycopg2.DatabaseError as err:
+            if self.conn:
+                self.conn.rollback()
+            print('An Error Occured: {}'.format(err))
+            sys.exit(1)
 
 class UserOps(DatabaseManager):
     """ Holds method to register a new user """
     def __init__(self, user_reg_info, admin=False):
         super().__init__(config_mode=None)
-        
         self.raw_email = user_reg_info['email']
         self.raw_password = user_reg_info['password']
         self.raw_username = user_reg_info['username']
@@ -164,20 +178,21 @@ class UserOps(DatabaseManager):
         self.hashed_password = None
         self.verified_hashed_password = None
 
-        self.datetime_registered = None       
+        self.datetime_registered = None
         self.login_status = False
 
+        self.auth_token = None
         self.encoded_token = None
-        self.decoded_token = None        
-        
+        self.decoded_token = None
+
 
     def username_check(self):
         """ Checks for username in DB, 
             returns custom msg if username is taken,
             else assigns it to self.hashed password var
-        """       
+        """
         try:
-            cur = super().connect_to_db()
+            cur = self.connect_to_db()
             cur.execute(
                     "SELECT * from users WHERE username LIKE '{}';".format(self.raw_username) 
                 )
@@ -187,20 +202,20 @@ class UserOps(DatabaseManager):
                 msg_out = 'Valid Username'
             else:
                 msg_out = 'Invalid Username'
-            
+
             return msg_out
         except psycopg2.DatabaseError as err:
-            super().db_error_handle(err)
-        
+            self.db_error_handle(err)
+
         finally:
-            super().close_database()  
+            self.close_database()
 
     def email_check(self):
         """ Checks provided email for syntax
-            contains only one @ 
-            Does not contain any of {{~`!@#$%^&*+=|\'";:,}}
+            contains only one @
+            Does not contain any of {{~`!#$%^&*+=|\'";:,}}
         """
-        if not re.search(r'[{~`!#$%^&*+=|][\\\'";:,}]', self.raw_email):
+        if not re.search(r'[~`!#$%^&*+=|;:,]', self.raw_email):
             if re.search(r'@', self.raw_email):
                 self.verified_email = self.raw_email
                 msg_out = 'Valid Email'
@@ -213,7 +228,7 @@ class UserOps(DatabaseManager):
 
     def password_check(self):
         """ Checks password Alteast 8 chars """
-        if len(self.raw_password) > 8 :
+        if len(self.raw_password) > 8:
             self.verified_password = self.raw_password.encode()
             msg_out = 'Valid Password'
         else:
@@ -224,8 +239,8 @@ class UserOps(DatabaseManager):
         """ Generate Authentication Token """
         try:
             self.encoded_token = jwt.encode(
-                {'username': self.verified_username}, 
-                os.getenv('SECRET'), 
+                {'username': self.verified_username},
+                os.getenv('SECRET'),
                 algorithm='HS256'
             )
             return self.encoded_token
@@ -238,7 +253,7 @@ class UserOps(DatabaseManager):
             payload = jwt.decode(
                 self.auth_token,
                 os.getenv('SECRET'),
-                algorithms='HS256'         
+                algorithms='HS256'
             )
             self.decoded_token = payload[self.verified_username]
             return self.decoded_token
@@ -264,25 +279,33 @@ class UserOps(DatabaseManager):
             raw_timestamp = pytz.utc.localize(datetime.datetime.utcnow())
             utc_timestamp = raw_timestamp.isoformat()
             
-            cur = super().connect_to_db()  
+            cur = self.connect_to_db()  
             cur.execute("""
-                INSERT INTO users (userid, username, name, email, admin_priviledges, login_status, reg_datetime, password) 
-                VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s);""",(self.verified_username, self.name, self.verified_email, self.admin,  self.login_status, utc_timestamp,  self.hashed_password.decode()))
-            super().save_database() 
+                INSERT INTO users (
+                    userid, username, name, email, admin_priviledges,\
+                    login_status, reg_datetime, password
+                    ) 
+                VALUES (DEFAULT, %s,%s,%s,%s,%s,%s,%s);""", (
+                    self.verified_username, self.name, self.verified_email, \
+                    self.admin, self.login_status, utc_timestamp, \
+                    self.hashed_password.decode()
+                )
+            )
+            self.save_database()
             return {"Registration success": " User stored in DB"}
 
         except psycopg2.DatabaseError as err:
-            super().db_error_handle(err)    
+            self.db_error_handle(err)
 
         finally:
-            super().close_database()       
+            self.close_database()
                     
 if __name__ == '__main__':
     pass
     # test_db_inst = DatabaseManager('testing')
     # test_db_inst.create_all_tables()
     # print('Good to go!!!!')
-    
+
     # UserOps({
     #         'username': 'jesus',
     #         'email': 'christ@nazareth.com',
