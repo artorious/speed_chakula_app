@@ -339,7 +339,20 @@ class UserLogs(UserOps, DatabaseManager):
 class MenuOps(DatabaseManager):
     """ Operations on menu items"""
     def fetch_menu_items(self):
-        return
+        """ Fetch all available menu items, return custom messaege if none """
+        try:
+            cur = self.connect_to_db()
+            cur.execute("SELECT * FROM menu;")
+            menu_items = cur.fetchall()
+            if menu_items == None:
+                menu_display = {'Menu Items': 'No menu items yet'}
+            else:
+                menu_display = {}
+                for menu_item in menu_items:
+                    menu_display[menu_item[0]] = {menu_item[3]:menu_item[2]}
+            return menu_display
+        except psycopg2.DatabaseError as err:
+            self.db_error_handle(err)
 
 if __name__ == '__main__':
     pass

@@ -1,7 +1,7 @@
 """ Defines routes for app """
 
 from flask import Blueprint, jsonify, request, make_response
-from app.api.v2.models import UserOps, UserLogs
+from app.api.v2.models import MenuOps, UserOps, UserLogs
 from app import create_app
 
 v2_base_bp = Blueprint('v2_base', __name__, url_prefix='/api/v2')
@@ -115,4 +115,5 @@ def login():
 @v2_base_bp.route('/menu', methods=['GET'])
 def menu():
     """ Fetch menu items """
-    pass
+    msg_out = MenuOps()
+    return jsonify(msg_out.fetch_menu_items())
