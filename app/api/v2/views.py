@@ -1,7 +1,7 @@
 """ Defines routes for app """
 
 from flask import Blueprint, jsonify, request, make_response
-from app.api.v2.models import MenuOps, UserOps, UserLogs
+from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogs
 from app import create_app
 
 v2_base_bp = Blueprint('v2_base', __name__, url_prefix='/api/v2')
@@ -24,7 +24,7 @@ def signup():
             'name' in signup_data and
             'password' in signup_data
         ):
-        new_user = UserOps(signup_data)  # Instantate
+        new_user = OperationsOnNewUsers(signup_data)  # Instantate
 
         if new_user.username_check() != 'Valid Username':
             msg_out = {
