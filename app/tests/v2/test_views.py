@@ -71,7 +71,7 @@ class TestHomePage(BaseTestCase):
 
     
 
-class TestUserOpsRoute(BaseTestCase):
+class TestAuthRoutes(BaseTestCase):
     """ Test route to register new user """
          
     def test_user_signup_status_code(self):
@@ -170,9 +170,6 @@ class TestUserOpsRoute(BaseTestCase):
         self.assertTrue(resp_data["Message"] == "Sorry.... the provided data is malformed")
         self.assertTrue(test_resp.content_type == 'application/json')
 
-
-class UserLogin(BaseTestCase):
-    """ Tests for login operation """
     def test_login_of_registered_user(self):
         """ Test that a registered user can login """
         # register a user
@@ -224,4 +221,14 @@ class UserLogin(BaseTestCase):
         self.assertEqual(resp_data.status_code, 404)
         self.assertTrue(resp_data["Status"] == "Operation failed")
         self.assertTrue(resp_data["Message"] == "Sorry.... the provided data is malformed")
+        self.assertTrue(test_resp.content_type == 'application/json')
+
+class MenuRoutes(BaseTestCase):
+    """ Tests for menu operations """
+
+    def test_menu_fetching(self):
+        """ Test that route can fetch all menu items """
+        test_resp = self.app.get('/api/v2/menu')
+        self.assertEqual(resp_data.status_code, 200)
+        self.assertNotEqual(resp_data.status_code, 404)
         self.assertTrue(test_resp.content_type == 'application/json')
