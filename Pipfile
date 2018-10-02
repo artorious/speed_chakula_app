@@ -15,10 +15,12 @@ coverage = "*"
 coveralls = "*"
 gunicorn = "*"
 python-dotenv = "*"
-"psycopg2" = "*"
 setuptools = "*"
 flasgger = "*"
-flask-restful = "*"
+"psycopg2-binary" = "*"
+"psycopg2" = "*"
+pyjwt = "*"
+bcrypt = "*"
 
 [dev-packages]
 

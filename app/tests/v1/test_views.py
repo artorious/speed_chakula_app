@@ -2,13 +2,14 @@
 
 import unittest
 import json
-from app import app
+from app import create_app
 
 class TestHomePage(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode="development")
+        self.app = self.app.test_client()
 
     def test_index_status_code(self):
         """Test for home page data"""
@@ -28,7 +29,16 @@ class TestHomePage(unittest.TestCase):
         )
 
         self.assertIn(b"Welcome User", test_resp.data, msg="Homepage message")
-
+    
+    def test_index_handles_404(self):
+        """ Page not found handling """
+        "Sorry... The page youa are looking for does not exist"
+        test_resp = self.app.get(
+            '/api/v1/t',
+            headers={'content-type': 'application/json'}
+        )
+        self.assertIn(b"Sorry...", test_resp.data, msg="Homepage not found message")
+        
     def tearDown(self):
         pass
 
@@ -36,7 +46,8 @@ class TestOrdersRoutes(unittest.TestCase):
     """ Test routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode="development")
+        self.app = self.app.test_client()
         self.sample_order_request_info = {
             'username': 'mrnoname',
             'user_tel': '0727161173',
@@ -45,7 +56,7 @@ class TestOrdersRoutes(unittest.TestCase):
             'user_location': '221B Baker st.'
         }
 
-    def test_get_orders_status_code(self):
+    def test_get_orders_success(self):
         """ Test that a valid path that returns HTTP response code of 200(OK)
         """
         test_resp = self.app.get(
@@ -58,7 +69,9 @@ class TestOrdersRoutes(unittest.TestCase):
         self.assertNotEqual(
             test_resp.status_code, 404, msg='Expected 200'
         )
-
+        self.assertTrue(test_resp.content_type == 'application/json')
+        
+        
     def test_post_orders_status_code(self):
         """ Test that valid path and data for successful order creation
             returns HTTP status 201 and a custom message to indicate success
@@ -72,8 +85,6 @@ class TestOrdersRoutes(unittest.TestCase):
         self.assertNotEqual(test_resp.status_code, 405)
         self.assertNotEqual(test_resp.status_code, 404)
         self.assertNotEqual(test_resp.status_code, 400)
-
-
         self.assertIn(b"Success", test_resp.data)
 
     def test_payload_before_posting(self):
@@ -94,7 +105,8 @@ class TestOrderByIdRoutes(unittest.TestCase):
     """ Test Routes """
     def setUp(self):
         """ Instantiate test client """
-        self.app = app.test_client()
+        self.app = create_app(config_mode="development")
+        self.app = self.app.test_client()
         self.sample_order_request_info = {
             'username': 'mrnoname',
             'user_tel': '0727161173',
@@ -165,63 +177,6 @@ class TestOrderByIdRoutes(unittest.TestCase):
 
         self.assertIn(
             b"Order status message",
-            test_resp.data,
-            msg="Does not output success msg to user"
-        )
-
-    def test_patch_order_by_id_status_code(self):
-        """ Test that a  non-error path returns a single order in JSON and
-            HTTP response code of 200 (OK)
-        """
-        self.app.post(
-            '/api/v1/orders',
-            data=json.dumps(self.sample_order_request_info),
-            headers={'content-type': 'application/json'}
-        )
-
-        test_resp = self.app.patch(
-            '/api/v1/orders/1',
-            data=json.dumps(
-                {"order_qty": 22, "user_location": "122C Spooner St."}
-            ),
-            headers={'content-type': 'application/json'}
-        )
-        self.assertEqual(
-            test_resp.status_code, 200, msg='Expected 200'
-        )
-        self.assertNotEqual(
-            test_resp.status_code, 404, msg='Expected 200'
-        )
-        self.assertNotEqual(
-            test_resp.status_code, 415, msg='Expected 200'
-        )
-        self.assertNotEqual(
-            test_resp.status_code, 422, msg='Expected 200'
-        )
-        self.assertNotEqual(
-            test_resp.status_code, 400, msg='Expected 200'
-        )
-
-    def test_patch_order_by_id_response_data(self):
-        """ Test that a  non-error path deletes a single order's details
-            in JSON and returns a Success message
-        """
-        self.app.post(
-            '/api/v1/orders',
-            data=json.dumps(self.sample_order_request_info),
-            headers={'content-type': 'application/json'}
-        )
-
-        test_resp = self.app.patch(
-            '/api/v1/orders/1',
-            data=json.dumps(
-                {"order_qty": 22, "user_location": "122C Spooner St."}
-            ),
-            headers={'content-type': 'application/json'}
-        )
-
-        self.assertIn(
-            b"Order modification message",
             test_resp.data,
             msg="Does not output success msg to user"
         )
