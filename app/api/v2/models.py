@@ -1,9 +1,10 @@
 """ Data representation - Routines for user to interact with the API. """
 
-import os
 import sys
 import datetime
 import re
+from os import getenv
+from flask import current_app
 import pytz
 import psycopg2
 import bcrypt
@@ -14,37 +15,13 @@ import jwt
 
 class DatabaseManager():
     """ Database methods """
-    def __init__(self, config_mode=None):
+    def __init__(self):
         self.conn = None
-        self.config_mode = config_mode
-        self.user = os.getenv("DATABASE_USERENAME")
-        self.db_name = os.getenv("DATABASE_NAME")
-        self.test_db_name = os.getenv("TEST_DATABASE_NAME")
-        self.password = os.getenv("DATABASE_PWD")
-        self.host = os.getenv("DATABASE_HOST")
-        self.port = os.getenv("DATABASE_PORT")
-
 
     def connect_to_db(self):
         """ Create connection to database and return cursor """
-        if self.config_mode == 'testing':
-            dbname = self.test_db_name
-        else:
-            dbname = self.db_name
-
-        password = self.password
-        user = self.user
-        host = self.host
-        port = self.port
-
         try:
-            self.conn = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                host=host,
-                port=port,
-                password=password
-            )
+            self.conn = psycopg2.connect(current_app.config['DATABASE_URL'])
             output = self.conn.cursor()
         except Exception as err:
             output = None
@@ -241,7 +218,7 @@ class OperationsOnNewUsers(DatabaseManager):
         try:
             self.encoded_token = jwt.encode(
                 {'username': self.verified_username},
-                os.getenv('SECRET'),
+                getenv('SECRET'),
                 algorithm='HS256'
             )
             return self.encoded_token
@@ -253,7 +230,7 @@ class OperationsOnNewUsers(DatabaseManager):
         try:
             payload = jwt.decode(
                 self.auth_token,
-                os.getenv('SECRET'),
+                getenv('SECRET'),
                 algorithms='HS256'
             )
             self.decoded_token = payload[self.verified_username]
