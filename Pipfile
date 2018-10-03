@@ -19,6 +19,8 @@ setuptools = "*"
 flasgger = "*"
 "psycopg2-binary" = "*"
 "psycopg2" = "*"
+pyjwt = "*"
+bcrypt = "*"
 
 [dev-packages]
 
