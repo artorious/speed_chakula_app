@@ -25,6 +25,11 @@ def signup():
             'name' in signup_data and
             'password' in signup_data
         ):
+
+        # validate username - call validator
+        # Validate email - call validator
+
+
         new_user = OperationsOnNewUsers(signup_data)  # Instantate
 
         if new_user.username_check() != 'Valid Username':

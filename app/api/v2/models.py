@@ -17,6 +17,31 @@ class DatabaseManager():
     """ Database methods """
     def __init__(self):
         self.conn = None
+        self.user_table_query = "CREATE TABLE users (\
+            userid SERIAL PRIMARY KEY, \
+            username VARCHAR(25) NOT NULL,\
+            name VARCHAR(50) NOT NULL, \
+            email VARCHAR(50) NOT NULL, \
+            admin_priviledges bool NOT NULL,\
+            login_status bool NOT NULL, \
+            registration_timestamp TIMESTAMPTZ NOT NULL, \
+            password VARCHAR NOT NULL \
+            );"
+        self.menu_table_query = "CREATE TABLE menu (\
+            foodid SERIAL PRIMARY KEY, \
+            userid INT NOT NULL REFERENCES users(userid), \
+            unit_price INT NOT NULL, \
+            description VARCHAR(100) NOT NULL\
+            );"
+        self.food_orders_query = "CREATE TABLE orders (\
+            orderid SERIAL PRIMARY KEY, \
+            userid INT NOT NULL REFERENCES users(userid), \
+            order_date DATE NOT NULL DEFAULT CURRENT_DATE, \
+            order_cost INT NOT NULL, \
+            orderstatus VARCHAR(15) NOT NULL, \
+            deliverylocation VARCHAR(50) NOT NULL, \
+            orderDescription VARCHAR(100) NOT NULL\
+            );"
 
     def connect_to_db(self):
         """ Create connection to database and return cursor """
@@ -29,74 +54,6 @@ class DatabaseManager():
 
         return output
 
-    def create_users_table(self):
-        """ Creates a table that hold user information """
-        try:
-            curs = self.connect_to_db()
-            curs.execute("DROP TABLE IF EXISTS users CASCADE")
-            curs.execute(
-                "CREATE TABLE users (\
-                    userid SERIAL PRIMARY KEY, \
-                    username VARCHAR(25) NOT NULL,\
-                    name VARCHAR(50) NOT NULL, \
-                    email VARCHAR(50) NOT NULL, \
-                    admin_priviledges bool NOT NULL,\
-                    login_status bool NOT NULL, \
-                    reg_datetime TIMESTAMPTZ NOT NULL, \
-                    password VARCHAR NOT NULL \
-                    );"
-                )
-            self.conn.commit()
-
-        except psycopg2.DatabaseError as err:
-            if self.conn:
-                self.conn.rollback()
-            print('An Error Occured: {}'.format(err))
-            sys.exit(1)
-
-    def create_food_menu_table(self):
-        """ Creates a table that holds all available menu/food items """
-        try:
-            curs = self.connect_to_db()
-            curs.execute("DROP TABLE IF EXISTS menu CASCADE")
-            curs.execute(
-                "CREATE TABLE menu (\
-                    foodid SERIAL PRIMARY KEY, \
-                    userid INT NOT NULL REFERENCES users(userid), \
-                    unit_price INT NOT NULL, \
-                    description VARCHAR(100) NOT NULL\
-                    );"
-                )
-            self.conn.commit()
-        except psycopg2.DatabaseError as err:
-            if self.conn:
-                self.conn.rollback()
-            print('An Error Occured: {}'.format(err))
-            sys.exit(1)
-
-    def create_food_orders_table(self):
-        """ Creates table that holds all food orders from users """
-        try:
-            curs = self.connect_to_db()
-            curs.execute("DROP TABLE IF EXISTS orders CASCADE")
-            curs.execute(
-                "CREATE TABLE orders (\
-                    orderid SERIAL PRIMARY KEY, \
-                    userid INT NOT NULL REFERENCES users(userid), \
-                    order_date DATE NOT NULL DEFAULT CURRENT_DATE, \
-                    order_cost INT NOT NULL, \
-                    orderstatus VARCHAR(15) NOT NULL, \
-                    deliverylocation VARCHAR(50) NOT NULL, \
-                    orderDescription VARCHAR(100) NOT NULL\
-                    );"
-                )
-            self.conn.commit()
-        except psycopg2.DatabaseError as err:
-            if self.conn:
-                self.conn.rollback()
-            print('An Error Occured: {}'.format(err))
-            sys.exit(1)
-
     def close_database(self):
         """ Closes database connection """
         if self.conn:
@@ -107,22 +64,25 @@ class DatabaseManager():
         if self.conn:
             self.conn.commit()
 
+    def create_table(self, table_name):
+        curs = self.connect_to_db()
+        curs.execute(table_name)
+        self.conn.commit()
+
     def create_all_tables(self):
         """ Create users, menu and orders tables """
-        self.create_users_table()
-        self.create_food_menu_table()
-        self.create_food_orders_table()
-        self.save_database()
-        self.close_database()
-        print('Tables created successfully!')
+        try:
+            self.create_table(self.user_table_query)
+            self.create_table(self.menu_table_query)
+            self.create_table(self.food_orders_query)
+            self.save_database()
+            self.close_database()
+            print('Tables created successfully!')
 
-
-
-    def db_error_handle(self, error):
-        """ Roll back Transaction and exit incase of error """
-        if self.conn:
-            self.conn.rollback()
-            print('An Error Occured: {}'.format(error))
+        except psycopg2.DatabaseError as err:
+            if self.conn:
+                self.conn.rollback()
+            print('An Error Occured: {}'.format(err))
             sys.exit(1)
 
     def drop_all_tables(self):
@@ -157,7 +117,7 @@ class OperationsOnNewUsers(DatabaseManager):
         self.verified_hashed_password = None
 
         self.datetime_registered = None
-        self.login_status = False
+        # self.login_status = False
 
         self.auth_token = None
         self.encoded_token = None
@@ -174,8 +134,8 @@ class OperationsOnNewUsers(DatabaseManager):
             cur.execute(
                     "SELECT * from users WHERE username LIKE '{}';".format(self.raw_username) 
                 )
-            username_check = cur.fetchone()
-            if username_check == None:
+            username_fetch = cur.fetchone()
+            if username_fetch == None:
                 self.verified_username = self.raw_username
                 msg_out = 'Valid Username'
             else:
@@ -261,7 +221,7 @@ class OperationsOnNewUsers(DatabaseManager):
             cur.execute("""
                 INSERT INTO users (
                     userid, username, name, email, admin_priviledges,\
-                    login_status, reg_datetime, password
+                    login_status, registration_timestamp, password
                     ) 
                 VALUES (DEFAULT, %s,%s,%s,%s,%s,%s,%s);""", (
                     self.verified_username, self.name, self.verified_email, \
@@ -279,15 +239,14 @@ class OperationsOnNewUsers(DatabaseManager):
             self.close_database()
                     
 
-class UserLogs(OperationsOnNewUsers):
-    """ Holds methods to log in/out """
+class UserLogInOperations(OperationsOnNewUsers):
+    """ Holds methods to login route"""
     def __init__(self, user_login_info, admin=False):
         self.raw_username = user_login_info['username']
         self.raw_password = user_login_info['password']
-        self.login_status = False
         
     def fetch_and_verify_user_login(self):
-        """ Fetch user matching login details """
+        """ Fetch user matching login details provided """
            
         try:
             cur = self.connect_to_db()
@@ -330,5 +289,13 @@ class MenuOps(DatabaseManager):
         except psycopg2.DatabaseError as err:
             self.db_error_handle(err)
 
+
+# Usename validator
+# password validator
+
+class UserCredentialsValidator
+
+
 if __name__ == '__main__':
+    #DatabaseManager.create_all_tables()
     pass
