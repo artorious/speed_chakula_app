@@ -2,7 +2,7 @@
 
 import unittest
 import bcrypt
-from app.api.v2.models import DatabaseManager, UserOps, UserLogs
+from app.api.v2.models import DatabaseManager, MenuOps, UserOps, UserLogs
 
 
 class BaseTestCase(unittest.TestCase):
@@ -43,7 +43,7 @@ class BaseTestCase(unittest.TestCase):
         self.sample_user = UserOps(self.sample_reg_info)
         self.sample_user2 = UserOps(self.sample_reg_info_bad_email)
         self.sample_user3 = UserOps(self.sample_reg_info_bad_password)
-
+        self.menu_instance = MenuOps
     def tearDown(self):
         self.test_database.drop_all_tables()
         self.test_database.close_database()
@@ -103,6 +103,9 @@ class TestUserOps(BaseTestCase):
             self.sample_user.encoded_token
         )
 
+    def test_fetch_menu_items_returns_dict(self):
+        """ Test that menu items in databse_returns dict """
+        self.assertIsInstance(self.menu_instance.fetch_menu_items(), dict, msg="method does not return dictionry")
 
 class TestUserLogs(BaseTestCase):
     """ Tests cases for logged in/out users """

@@ -112,3 +112,8 @@ def login():
         }
         return jsonify(msg_out), 500
  
+
+@v2_base_bp.route('/menu', methods=['GET'])
+def menu():
+    """ Fetch menu items """
+    pass

@@ -303,7 +303,6 @@ class UserOps(DatabaseManager):
             self.close_database()
                     
 
-
 class UserLogs(UserOps, DatabaseManager):
     """ Holds methods to log in/out """
     def __init__(self, user_login_info, admin=False):
@@ -337,6 +336,11 @@ class UserLogs(UserOps, DatabaseManager):
         finally:
             super().close_database()
 
+
+class MenuOps(DatabaseManager):
+    """ Operations on menu items"""
+    def fetch_menu_items(self):
+        return
 
 if __name__ == '__main__':
     pass
