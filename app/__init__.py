@@ -1,5 +1,4 @@
 """ Initialization file - App factory"""
-import os
 from flask import Flask, jsonify
 from flasgger import Swagger
 from instance.config import app_config
@@ -19,7 +18,7 @@ def server_side_error(err):
 
 
 
-def create_app(config_mode):
+def create_app(config_mode=None):
     """ Init the app """
     app = Flask(__name__, instance_relative_config=True)
     swagger = Swagger(app)  # V1 Documentation on flasgger

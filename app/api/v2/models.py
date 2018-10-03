@@ -9,6 +9,7 @@ import pytz
 import psycopg2
 import bcrypt
 import jwt
+from run import app
 
 
 
@@ -19,11 +20,10 @@ class DatabaseManager():
         self.conn = None
         self.user_table_query = "CREATE TABLE users (\
             userid SERIAL PRIMARY KEY, \
-            username VARCHAR(25) NOT NULL,\
+            username VARCHAR(25) UNIQUE NOT NULL,\
             name VARCHAR(50) NOT NULL, \
-            email VARCHAR(50) NOT NULL, \
+            email VARCHAR(50) UNIQUE NOT NULL, \
             admin_priviledges bool NOT NULL,\
-            login_status bool NOT NULL, \
             registration_timestamp TIMESTAMPTZ NOT NULL, \
             password VARCHAR NOT NULL \
             );"
@@ -31,7 +31,7 @@ class DatabaseManager():
             foodid SERIAL PRIMARY KEY, \
             userid INT NOT NULL REFERENCES users(userid), \
             unit_price INT NOT NULL, \
-            description VARCHAR(100) NOT NULL\
+            description VARCHAR(100) UNIQUE NOT NULL\
             );"
         self.food_orders_query = "CREATE TABLE orders (\
             orderid SERIAL PRIMARY KEY, \
@@ -40,7 +40,7 @@ class DatabaseManager():
             order_cost INT NOT NULL, \
             orderstatus VARCHAR(15) NOT NULL, \
             deliverylocation VARCHAR(50) NOT NULL, \
-            orderDescription VARCHAR(100) NOT NULL\
+            orderDescription VARCHAR(100) UNIQUE NOT NULL\
             );"
 
     def connect_to_db(self):
@@ -103,75 +103,20 @@ class DatabaseManager():
 class OperationsOnNewUsers(DatabaseManager):
     """ Holds method to register a new user """
     def __init__(self, user_reg_info, admin=False):
-        self.raw_email = user_reg_info['email']
-        self.raw_password = user_reg_info['password']
-        self.raw_username = user_reg_info['username']
+        self.verified_username = user_reg_info['username']
+        self.verified_password = user_reg_info['password']
+        self.verified_email = user_reg_info['email']
         self.name = user_reg_info['name']
         self.admin = admin
-
-        self.verified_username = None
-        self.verified_email = None
-        self.verified_password = None
 
         self.hashed_password = None
         self.verified_hashed_password = None
 
         self.datetime_registered = None
-        # self.login_status = False
 
         self.auth_token = None
         self.encoded_token = None
         self.decoded_token = None
-
-
-    def username_check(self):
-        """ Checks for username in DB, 
-            returns custom msg if username is taken,
-            else assigns it to self.hashed password var
-        """
-        try:
-            cur = self.connect_to_db()
-            cur.execute(
-                    "SELECT * from users WHERE username LIKE '{}';".format(self.raw_username) 
-                )
-            username_fetch = cur.fetchone()
-            if username_fetch == None:
-                self.verified_username = self.raw_username
-                msg_out = 'Valid Username'
-            else:
-                msg_out = 'Invalid Username'
-
-            return msg_out
-        except psycopg2.DatabaseError as err:
-            self.db_error_handle(err)
-
-        finally:
-            self.close_database()
-
-    def email_check(self):
-        """ Chserecks provided email for syntax
-            contains only one @
-            Does not contain any of {{~`!#$%^&*+=|\'";:,}}
-        """
-        if not re.search(r'[~`!#$%^&*+=|;:,]', self.raw_email):
-            if re.search(r'@', self.raw_email):
-                self.verified_email = self.raw_email
-                msg_out = 'Valid Email'
-            else:
-                msg_out = 'Invalid Email'
-        else:
-            msg_out = 'Invalid Email'
-
-        return msg_out
-
-    def password_check(self):
-        """ Checks password Alteast 8 chars """
-        if len(self.raw_password) > 8:
-            self.verified_password = self.raw_password.encode()
-            msg_out = 'Valid Password'
-        else:
-            msg_out = 'Invalid Password'
-        return msg_out
 
     def auth_token_encoding(self):
         """ Generate Authentication Token """
@@ -221,11 +166,11 @@ class OperationsOnNewUsers(DatabaseManager):
             cur.execute("""
                 INSERT INTO users (
                     userid, username, name, email, admin_priviledges,\
-                    login_status, registration_timestamp, password
+                    registration_timestamp, password
                     ) 
                 VALUES (DEFAULT, %s,%s,%s,%s,%s,%s,%s);""", (
                     self.verified_username, self.name, self.verified_email, \
-                    self.admin, self.login_status, utc_timestamp, \
+                    self.admin, utc_timestamp, \
                     self.hashed_password.decode()
                 )
             )
@@ -290,12 +235,60 @@ class MenuOps(DatabaseManager):
             self.db_error_handle(err)
 
 
-# Usename validator
-# password validator
 
-class UserCredentialsValidator
+
+class UserCredentialsValidator(OperationsOnNewUsers):
+    """ Holds methods to validate Usename, password, Email validator """
+    def __init__(self, raw_user_reg_data):
+        self.raw_email = raw_user_reg_data['email']
+        self.raw_password = raw_user_reg_data['password']
+        self.raw_username = raw_user_reg_data['username']
+
+    def username_check(self):
+        """ Checks for username in DB, 
+            returns custom msg if username is taken,
+            else assigns it to self.hashed password var
+        """
+        try:
+            cur = self.connect_to_db()
+            cur.execute(
+                    "SELECT * from users WHERE username LIKE '{}';".format(self.raw_username) 
+                )
+            username_fetch = cur.fetchone()
+            if username_fetch == None:
+                msg_out = 'Valid Username'
+            else:
+                msg_out = 'Invalid Username'
+
+            return msg_out
+        except psycopg2.DatabaseError as err:
+            self.db_error_handle(err)
+
+        finally:
+            self.close_database()
+
+    def email_check(self):
+        """ Chserecks provided email for syntax
+            contains atleast one @ and a . after it
+        """
+        if re.search('[^@]+@[^@]+\.[^@]+', self.raw_email):
+            msg_out = 'Valid Email'
+        else:
+            msg_out = 'Invalid Email'
+
+        return msg_out
+
+    def password_check(self):
+        """ Checks password Alteast 8 chars """
+        if len(self.raw_password) > 8:
+            msg_out = 'Valid Password'
+        else:
+            msg_out = 'Invalid Password'
+        return msg_out
 
 
 if __name__ == '__main__':
-    #DatabaseManager.create_all_tables()
-    pass
+    with app.app_context():
+        sampledb = DatabaseManager()
+        sampledb.create_all_tables()
+
