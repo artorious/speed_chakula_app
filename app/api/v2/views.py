@@ -87,9 +87,9 @@ def login():
             'password' in login_data        
         ):
         try:
-            user_log = UserLogs(login_data)  # Instantate
-            if user_log.fetch_and_verify_user_login():
-                auth_token =  user_log.auth_token_encoding()
+            attempting_user = UserLogInOperations(login_data)  # Instantate
+            if attempting_user.fetch_and_verify_user_login():
+                auth_token =  attempting_user.auth_token_encoding()
                 if auth_token:
                     msg_out = {
                     "Status": "Success",

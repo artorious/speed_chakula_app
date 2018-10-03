@@ -2,8 +2,7 @@
 
 import unittest
 import bcrypt
-from app.api.v2.models import DatabaseManager, MenuOps, OperationsOnNewUsers, UserLoginOperations
-
+from app.api.v2.models import DatabaseManager, MenuOps, OperationsOnNewUsers, UserLogInOperations
 
 class BaseTestCase(unittest.TestCase):
     """ Base Tests """
@@ -37,8 +36,9 @@ class BaseTestCase(unittest.TestCase):
             'username': 'ihaveneverregistered',
             'password': 'neverevernever'
         }
+       
+        self.test_database = DatabaseManager()
 
-        self.test_database = DatabaseManager(config_mode='testing')
         self.test_database.create_all_tables()
         self.sample_user = OperationsOnNewUsers(self.sample_reg_info)
         self.sample_user2 = OperationsOnNewUsers(self.sample_reg_info_bad_email)

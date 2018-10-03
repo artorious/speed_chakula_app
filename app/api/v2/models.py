@@ -9,8 +9,6 @@ import pytz
 import psycopg2
 import bcrypt
 import jwt
-from run import app
-
 
 
 
@@ -46,7 +44,7 @@ class DatabaseManager():
     def connect_to_db(self):
         """ Create connection to database and return cursor """
         try:
-            self.conn = psycopg2.connect(current_app.config['DATABASE_URL'])
+            self.conn=psycopg2.connect(current_app.config['DATABASE_URL'])
             output = self.conn.cursor()
         except Exception as err:
             output = None
@@ -105,15 +103,13 @@ class OperationsOnNewUsers(DatabaseManager):
     def __init__(self, user_reg_info, admin=False):
         self.verified_username = user_reg_info['username']
         self.verified_password = user_reg_info['password']
+        self.encoded_password = self.verified_password.encode()
         self.verified_email = user_reg_info['email']
         self.name = user_reg_info['name']
         self.admin = admin
-
         self.hashed_password = None
         self.verified_hashed_password = None
-
         self.datetime_registered = None
-
         self.auth_token = None
         self.encoded_token = None
         self.decoded_token = None
@@ -147,12 +143,12 @@ class OperationsOnNewUsers(DatabaseManager):
         """ generates hashed password and assigns to self.hashed_password var
         """
         self.hashed_password = bcrypt.hashpw(
-            self.verified_password, bcrypt.gensalt()
+            self.encoded_password, bcrypt.gensalt()
         )
 
     def verify_passwd_hash(self):
         """verify hashed password matches raw password """
-        if bcrypt.checkpw(self.verified_password, self.hashed_password):
+        if bcrypt.checkpw(self.encoded_password, self.hashed_password):
             self.verified_hashed_password = self.hashed_password
 
     def register_user(self):
@@ -168,7 +164,7 @@ class OperationsOnNewUsers(DatabaseManager):
                     userid, username, name, email, admin_priviledges,\
                     registration_timestamp, password
                     ) 
-                VALUES (DEFAULT, %s,%s,%s,%s,%s,%s,%s);""", (
+                VALUES (DEFAULT, %s,%s,%s,%s,%s,%s);""", (
                     self.verified_username, self.name, self.verified_email, \
                     self.admin, utc_timestamp, \
                     self.hashed_password.decode()
@@ -201,7 +197,7 @@ class UserLogInOperations(OperationsOnNewUsers):
             user_details = cur.fetchone()
             if bcrypt.hashpw(
                     self.raw_password,bcrypt.gensalt()
-                ).decode() in user_details[7]:
+                ).decode() in user_details[6]:
                 msg_out = True
                 self.login_status = True
             elif user_details == None:
@@ -233,8 +229,6 @@ class MenuOps(DatabaseManager):
             return menu_display
         except psycopg2.DatabaseError as err:
             self.db_error_handle(err)
-
-
 
 
 class UserCredentialsValidator(OperationsOnNewUsers):
@@ -271,7 +265,7 @@ class UserCredentialsValidator(OperationsOnNewUsers):
         """ Chserecks provided email for syntax
             contains atleast one @ and a . after it
         """
-        if re.search('[^@]+@[^@]+\.[^@]+', self.raw_email):
+        if re.search(r'[^@]+@[^@]+\.[^@]+', self.raw_email):
             msg_out = 'Valid Email'
         else:
             msg_out = 'Invalid Email'
@@ -288,7 +282,5 @@ class UserCredentialsValidator(OperationsOnNewUsers):
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        sampledb = DatabaseManager()
-        sampledb.create_all_tables()
+    pass
 

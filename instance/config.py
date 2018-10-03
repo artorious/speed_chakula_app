@@ -5,7 +5,7 @@ class Config():
     """ General Config. """
     DEBUG = False
     SECRET = getenv('SECRET')
-    APP_SETTINGS = getenv("APP_SETTINGS")
+    APP_SETTINGS = getenv('APP_SETTINGS')
 
 class DevConfig(Config):
     """ Development Config. """

@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flasgger import Swagger
 from instance.config import app_config
 
+
 # Custom error handlers
 def page_not_found(err):
     """ 404 status custom return message """

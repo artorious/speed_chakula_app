@@ -8,8 +8,10 @@ from app.api.v2.models import DatabaseManager
 class BaseTestCase(unittest.TestCase):
     """ Base Tests """
     def setUp(self):
-        self.app = create_app(config_mode='testing')
+        self.app = create_app('testing')
         self.app = self.app.test_client()
+        self.test_database = DatabaseManager()
+        self.test_database.create_all_tables()
         self.sample_reg_info = {
             'username': 'johnwatson',
             'email': 'consultingdetective@email.com',
@@ -29,9 +31,7 @@ class BaseTestCase(unittest.TestCase):
             'password': 'passwd',
             'name': 'Arthur Ngondo'
         }
-        self.test_database = DatabaseManager(config_mode='testing')
-        self.test_database.create_all_tables()
-
+        
         self.sample_login_info_registered = {
             'username': 'johnwatson',
             'password': 'theelephantman'
