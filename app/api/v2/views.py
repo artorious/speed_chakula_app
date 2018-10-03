@@ -2,7 +2,7 @@
 
 
 from flask import Blueprint, jsonify, request, make_response
-from app.api.v2.models import UserOps
+from app.api.v2.models import UserOps, UserLogs
 from app import create_app
 
 v2_base_bp = Blueprint('v2_base', __name__, url_prefix='/api/v2')
@@ -77,5 +77,38 @@ def signup():
 @v2_auth_bp.route('/login', methods=['POST'])
 def login():
     """ User Login """
-    return 
-  
+    login_data = request.get_json(force=True)
+    if (
+            'username' in login_data and
+            'password' in login_data        
+        ):
+        try:
+            user_log = UserLogs(login_data)  # Instantate
+            if user_log.fetch_and_verify_user_login():
+                auth_token =  user_log.auth_token_encoding()
+                if auth_token:
+                    msg_out = {
+                    "Status": "Success",
+                    "Message": "Login successful",
+                    "Authentication token": auth_token.decode()
+                } 
+            
+            else:
+                msg_out = {
+                    "Status" : "Login Error",
+                    "Message": "Invalid username/password. Try again"
+                }
+            return  make_response(jsonify(msg_out)), 200
+        except Exception as err:
+                msg_out = {
+                    "Status": "Login failed",
+                    "Message": 'Error: {}'.format(err)
+                }
+                return  make_response(jsonify(msg_out)), 500
+    else:
+        msg_out = {
+            "Status" : "Operation failed",
+            "Message": "Sorry.... the provided data is malformed"
+        }
+        return jsonify(msg_out), 500
+ 
