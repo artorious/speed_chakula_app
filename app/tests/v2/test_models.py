@@ -2,8 +2,7 @@
 
 import unittest
 import bcrypt
-from app.api.v2.models import DatabaseManager, MenuOps, OperationsOnNewUsers, UserLogs
-
+from app.api.v2.models import DatabaseManager, MenuOps, OperationsOnNewUsers, UserLogInOperations
 
 class BaseTestCase(unittest.TestCase):
     """ Base Tests """
@@ -37,8 +36,9 @@ class BaseTestCase(unittest.TestCase):
             'username': 'ihaveneverregistered',
             'password': 'neverevernever'
         }
+       
+        self.test_database = DatabaseManager()
 
-        self.test_database = DatabaseManager(config_mode='testing')
         self.test_database.create_all_tables()
         self.sample_user = OperationsOnNewUsers(self.sample_reg_info)
         self.sample_user2 = OperationsOnNewUsers(self.sample_reg_info_bad_email)
@@ -90,7 +90,7 @@ class TestOperationsOnNewUsers(BaseTestCase):
         test_dict = self.menu_instance.fetch_menu_items()
         self.assertIsInstance(test_dict, dict, msg="method does not return dictionry")
 
-class TestUserLogs(BaseTestCase):
+class TestUserLoginOperations(BaseTestCase):
     """ Tests cases for logged in/out users """
     def test_login_operation_registered_user(self):
         """ Test that a registered user can login """
@@ -104,10 +104,10 @@ class TestUserLogs(BaseTestCase):
 
         # login with
         legit_login_details = self.sample_login_info_registered
-        test_legit_login = UserLogs(legit_login_details)
+        test_legit_login = UserLoginOperations(legit_login_details)
         
         invalid_login_details = self.sample_login_info_non_registered
-        test_invalid_login = UserLogs(invalid_login_details)
+        test_invalid_login = UserLoginOperations(invalid_login_details)
 
         valid_login = test_legit_login.fetch_and_verify_user_login()
         invalid_login = test_invalid_login.fetch_and_verify_user_login()

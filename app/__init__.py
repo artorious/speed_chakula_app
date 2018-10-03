@@ -1,10 +1,8 @@
 """ Initialization file - App factory"""
-import os
 from flask import Flask, jsonify
 from flasgger import Swagger
-from app.api.v1.models import FoodOrders, FoodOrderOps
-from app.api.v2.models import DatabaseManager, UserLogs, OperationsOnNewUsers
 from instance.config import app_config
+
 
 # Custom error handlers
 def page_not_found(err):
@@ -21,13 +19,12 @@ def server_side_error(err):
 
 
 
-def create_app(config_mode):
+def create_app(config_mode=None):
     """ Init the app """
     app = Flask(__name__, instance_relative_config=True)
-    swagger = Swagger(app)  # Documentation
+    swagger = Swagger(app)  # V1 Documentation on flasgger
     # config file loading
-    app.config.from_object(app_config[config_mode])
-    app.config.from_pyfile('config.py')  
+    app.config.from_object(app_config[config_mode])  
     from app.api.v1 import views as views_v1
     from app.api.v2 import views as views_v2
 

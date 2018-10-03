@@ -2,7 +2,7 @@
 
 
 from flask import Blueprint, jsonify, request, make_response
-from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogs
+from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogInOperations, UserCredentialsValidator
 from app import create_app
 
 v2_base_bp = Blueprint('v2_base', __name__, url_prefix='/api/v2')
@@ -25,29 +25,32 @@ def signup():
             'name' in signup_data and
             'password' in signup_data
         ):
-        new_user = OperationsOnNewUsers(signup_data)  # Instantate
 
-        if new_user.username_check() != 'Valid Username':
+        raw_user = UserCredentialsValidator(signup_data)
+        # validate username and email
+        if raw_user.username_check() != 'Valid Username':
             msg_out = {
                 "Status": "Username Error",
                 "Message": "Username already exists. Try a different username"
             }
             return make_response(jsonify(msg_out)), 202
 
-        elif new_user.email_check() != 'Valid Email':
+        elif raw_user.email_check() != 'Valid Email':
             msg_out = {
                 "Status": "Email Error",
                 "Message": "Invalid Email address. Check syntax and try again"
             }
             return make_response(jsonify(msg_out)), 202
 
-        elif new_user.password_check() != 'Valid Password':
+        elif raw_user.password_check() != 'Valid Password':
             msg_out = {
                 "Status" : "Password Error",
                 "Message": "Invalid password. Should be atlest 8 characters long"
             }
             return make_response(jsonify(msg_out)), 202
         else:
+
+            new_user = OperationsOnNewUsers(signup_data)  # Instantate
             try:
                 new_user.gen_passwd_hash()  # Hash password for storage
                 new_user.verify_passwd_hash()  # Verify password is succesfully hashed
@@ -59,6 +62,7 @@ def signup():
                     "Authentication token": auth_token.decode()
                 }
                 return  make_response(jsonify(msg_out)), 201
+            
             except Exception as err:
                 msg_out = {
                     "Status": "Registration failed",
@@ -83,9 +87,9 @@ def login():
             'password' in login_data        
         ):
         try:
-            user_log = UserLogs(login_data)  # Instantate
-            if user_log.fetch_and_verify_user_login():
-                auth_token =  user_log.auth_token_encoding()
+            attempting_user = UserLogInOperations(login_data)  # Instantate
+            if attempting_user.fetch_and_verify_user_login():
+                auth_token =  attempting_user.auth_token_encoding()
                 if auth_token:
                     msg_out = {
                     "Status": "Success",
