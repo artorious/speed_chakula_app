@@ -40,6 +40,7 @@ class BaseTestCase(unittest.TestCase):
 class TestHomePage(BaseTestCase):
     """ Test Routes """
 
+
     def test_index_status_code(self):
         """Test for home page data"""
         test_resp = self.app.get(

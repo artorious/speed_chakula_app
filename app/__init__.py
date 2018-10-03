@@ -3,8 +3,6 @@ import os
 from flask import Flask, jsonify
 from flasgger import Swagger
 from app.api.v1.models import FoodOrders, FoodOrderOps
-
-
 from app.api.v2.models import DatabaseManager
 from instance.config import app_config
 
@@ -30,7 +28,6 @@ def create_app(config_mode):
 
     # Register Blueprints
     app.register_blueprint(views_v1.v1_bp)
-
     app.register_blueprint(views_v2.v2_base_bp)
     app.register_blueprint(views_v2.v2_auth_bp)
     # Custom error handlers
