@@ -2,7 +2,7 @@
 
 import unittest
 import bcrypt
-from app.api.v2.models import DatabaseManager, UserOps
+from app.api.v2.models import DatabaseManager, UserOps, UserLogs
 
 
 class BaseTestCase(unittest.TestCase):
@@ -27,6 +27,17 @@ class BaseTestCase(unittest.TestCase):
             'password': 'passwd',
             'name': 'Arthur Ngondo'
         }
+
+        self.sample_login_info_registered = {
+            'username': 'shelockholmes',
+            'password': 'theelephantman'
+        }
+
+        self.sample_login_info_non_registered = {
+            'username': 'ihaveneverregistered',
+            'password': 'neverevernever'
+        }
+
         self.test_database = DatabaseManager(config_mode='testing')
         self.test_database.create_all_tables()
         self.sample_user = UserOps(self.sample_reg_info)
@@ -79,12 +90,26 @@ class TestUserOps(BaseTestCase):
         )
     
     def test_auth_token_encoding(self):
-        auth_token = self.sample_user.auth_token_encoding(self.sample_user.verified_username)
+        auth_token = \
+        self.sample_user.auth_token_encoding(self.sample_user.verified_username)
         self.assertTrue(isinstance(auth_token, bytes))
 
     def test_auth_token_decoding(self):
-        auth_token = self.sample_user.auth_token_encoding(self.sample_user.verified_username)
+        auth_token = \
+        self.sample_user.auth_token_encoding(self.sample_user.verified_username)
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(
-            self.sample_user.auth_token_decoding(auth_token) == self.sample_user.encoded_token
+            self.sample_user.auth_token_decoding(auth_token) == \
+            self.sample_user.encoded_token
         )
+
+
+class TestUserLogs(BaseTestCase):
+    """ Tests cases for logged in/out users """
+    def test_login_operation_registered_user(self):
+        """ Test that a registered user can login """
+        test_legit_login = UserLogs(self.sample_login_info_registered)
+        test_invalid_login = UserLogs(self.sample_login_info_non_registered)
+
+        self.assertTrue(test_legit_login.fetch_and_verify_user_login())
+        self.assertFalse(test_invalid_login.fetch_and_verify_user_login())

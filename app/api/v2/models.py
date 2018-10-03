@@ -162,6 +162,7 @@ class DatabaseManager():
             print('An Error Occured: {}'.format(err))
             sys.exit(1)
 
+
 class UserOps(DatabaseManager):
     """ Holds method to register a new user """
     def __init__(self, user_reg_info, admin=False):
@@ -301,6 +302,23 @@ class UserOps(DatabaseManager):
         finally:
             self.close_database()
                     
+
+
+class UserLogs(UserOps, DatabaseManager):
+    """ Holds methods to log in/out """
+    def __init__(self, user_login_info, admin=False):
+        
+        self.raw_username = user_login_info['username']
+        self.raw_password = user_login_info['password']
+        self.login_status = False
+        
+    def fetch_and_verify_user_login(self):
+        """ Fetch user matching login details. 
+            Returns True for registered users, else False
+        """
+        return
+
+
 if __name__ == '__main__':
     pass
  

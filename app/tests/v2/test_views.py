@@ -31,6 +31,16 @@ class BaseTestCase(unittest.TestCase):
         }
         self.test_database = DatabaseManager(config_mode='testing')
         self.test_database.create_all_tables()
+
+        self.sample_login_info_registered = {
+            'username': 'shelockholmes',
+            'password': 'theelephantman'
+        }
+
+        self.sample_login_info_non_registered = {
+            'username': 'ihaveneverregistered',
+            'password': 'neverevernever'
+        }
         #TODO: Helper methods (login/out)
 
     def tearDown(self):
@@ -88,10 +98,10 @@ class TestUserOpsRoute(BaseTestCase):
             data=json.dumps(self.sample_reg_info),
             headers={'content-type': 'application/json'}
         )
-        data = json.loads(test_resp.data.decode())
-        self.assertTrue(data["Status"] == "Success")
-        self.assertTrue(data["Message"] == "Registration successful")
-        self.assertTrue(data["Authentication token"])
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertTrue(resp_data["Status"] == "Success")
+        self.assertTrue(resp_data["Message"] == "Registration successful")
+        self.assertTrue(resp_data["Authentication token"])
         self.assertTrue(test_resp.content_type == 'application/json')
 
     def test_user_signup_of_an_existing_user(self):
@@ -109,9 +119,9 @@ class TestUserOpsRoute(BaseTestCase):
             data=json.dumps(self.sample_reg_info),
             headers={'content-type': 'application/json'}
         )
-        data = json.loads(test_resp.data.decode())
-        self.assertTrue(data["Status"] == "Username Error")
-        self.assertTrue(data["Message"] == "Username already exists. Try a different username")
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertTrue(resp_data["Status"] == "Username Error")
+        self.assertTrue(resp_data["Message"] == "Username already exists. Try a different username")
         self.assertTrue(test_resp.content_type == 'application/json')
         self.assertEqual(test_resp.status_code, 202)
 
@@ -125,9 +135,9 @@ class TestUserOpsRoute(BaseTestCase):
             data=json.dumps(self.sample_reg_info_bad_email),
             headers={'content-type': 'application/json'}
         )
-        data = json.loads(test_resp.data.decode())
-        self.assertTrue(data["Status"] == "Email Error")
-        self.assertTrue(data["Message"] == "Invalid Email address. Check syntax and try again")
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertTrue(resp_data["Status"] == "Email Error")
+        self.assertTrue(resp_data["Message"] == "Invalid Email address. Check syntax and try again")
         self.assertTrue(test_resp.content_type == 'application/json')
         self.assertEqual(test_resp.status_code, 202)
 
@@ -141,9 +151,9 @@ class TestUserOpsRoute(BaseTestCase):
             data=json.dumps(self.sample_reg_info_bad_email),
             headers={'content-type': 'application/json'}
         )
-        data = json.loads(test_resp.data.decode())
-        self.assertTrue(data["Status"] == "Password Error")
-        self.assertTrue(data["Message"] == "Invalid password. Should be atlest 8 characters long")
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertTrue(resp_data["Status"] == "Password Error")
+        self.assertTrue(resp_data["Message"] == "Invalid password. Should be atlest 8 characters long")
         self.assertTrue(test_resp.content_type == 'application/json')
         self.assertEqual(test_resp.status_code, 202)
     
@@ -156,7 +166,63 @@ class TestUserOpsRoute(BaseTestCase):
             data=json.dumps('I want to register'),
             headers={'content-type': 'application/json'}
         )
-        data = json.loads(test_resp.data.decode())
-        self.assertTrue(data["Status"] == "Operation failed")
-        self.assertTrue(data["Message"] == "Sorry.... the provided data is malformed")
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertTrue(resp_data["Status"] == "Operation failed")
+        self.assertTrue(resp_data["Message"] == "Sorry.... the provided data is malformed")
+        self.assertTrue(test_resp.content_type == 'application/json')
+
+
+class UserLogin(BaseTestCase):
+    """ Tests for login operation """
+    def test_login_of_registered_user(self):
+        """ Test that a registered user can login """
+        # register a user
+        test_registration = self.app.post(
+            '/api/v2/auth/signup',
+            data=json.dumps(self.sample_reg_info),
+            headers={'content-type': 'application/json'}
+        )
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertTrue(resp_data["Status"] == "Success")
+        self.assertTrue(resp_data["Message"] == "Registration successful")
+        self.assertTrue(resp_data["Authentication token"])
+        self.assertTrue(test_resp.content_type == 'application/json')
+
+        # Try to login
+        test_resp = self.app.post(
+            '/api/v2/auth/login',
+            data=json.dumps(self.sample_login_info_registered),
+            headers={'content-type': 'application/json'}
+        )
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertEqual(resp_data.status_code, 200)
+        self.assertTrue(resp_data["Status"] == "Success")
+        self.assertTrue(resp_data["Message"] == "Login successful")
+        self.assertTrue(resp_data["Authentication token"])
+        self.assertTrue(test_resp.content_type == 'application/json')
+
+    def test_login_of_non_registered_user(self):
+        """ Test that a non-registered user cannot login """
+        test_resp = self.app.post(
+            '/api/v2/auth/login',
+            data=json.dumps(self.sample_login_info_non_registered),
+            headers={'content-type': 'application/json'}
+        )
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertEqual(resp_data.status_code, 404)
+        self.assertTrue(resp_data["Status"] == "Login Error")
+        self.assertTrue(resp_data["Message"] == "Invalid username/password. Try again")
+        self.assertTrue(test_resp.content_type == 'application/json')
+
+    def test_login_with_malformed_input(self):
+        """ Test that a malformed input cannot login """
+        test_resp = self.app.post(
+            '/api/v2/auth/login',
+            data=json.dumps('Can I log in?'),
+            headers={'content-type': 'application/json'}
+        )
+        resp_data = json.loads(test_resp.resp_data.decode())
+        self.assertEqual(resp_data.status_code, 404)
+        self.assertTrue(resp_data["Status"] == "Operation failed")
+        self.assertTrue(resp_data["Message"] == "Sorry.... the provided data is malformed")
         self.assertTrue(test_resp.content_type == 'application/json')
