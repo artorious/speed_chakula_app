@@ -163,10 +163,9 @@ class DatabaseManager():
             sys.exit(1)
 
 
-class UserOps(DatabaseManager):
+class OperationsOnNewUsers(DatabaseManager):
     """ Holds method to register a new user """
     def __init__(self, user_reg_info, admin=False):
-        super().__init__(config_mode=None)
         self.raw_email = user_reg_info['email']
         self.raw_password = user_reg_info['password']
         self.raw_username = user_reg_info['username']
@@ -213,7 +212,7 @@ class UserOps(DatabaseManager):
             self.close_database()
 
     def email_check(self):
-        """ Checks provided email for syntax
+        """ Chserecks provided email for syntax
             contains only one @
             Does not contain any of {{~`!#$%^&*+=|\'";:,}}
         """
@@ -303,10 +302,9 @@ class UserOps(DatabaseManager):
             self.close_database()
                     
 
-class UserLogs(UserOps, DatabaseManager):
+class UserLogs(OperationsOnNewUsers):
     """ Holds methods to log in/out """
     def __init__(self, user_login_info, admin=False):
-        
         self.raw_username = user_login_info['username']
         self.raw_password = user_login_info['password']
         self.login_status = False
@@ -315,7 +313,7 @@ class UserLogs(UserOps, DatabaseManager):
         """ Fetch user matching login details """
            
         try:
-            cur = super().connect_to_db()
+            cur = self.connect_to_db()
             cur.execute(
                     "SELECT * from users WHERE username LIKE '%s';", (self.raw_username) 
                 )
@@ -331,17 +329,29 @@ class UserLogs(UserOps, DatabaseManager):
             return msg_out
 
         except psycopg2.DatabaseError as err:
-            super().db_error_handle(err)
+            self.db_error_handle(err)
         
         finally:
-            super().close_database()
+            self.close_database()
 
 
 class MenuOps(DatabaseManager):
     """ Operations on menu items"""
     def fetch_menu_items(self):
-        return
+        """ Fetch all available menu items, return custom messaege if none """
+        try:
+            cur = self.connect_to_db()
+            cur.execute("SELECT * FROM menu;")
+            menu_items = cur.fetchall()
+            if menu_items == None:
+                menu_display = {'Menu Items': 'No menu items yet'}
+            else:
+                menu_display = {}
+                for menu_item in menu_items:
+                    menu_display[menu_item[0]] = {menu_item[3]:menu_item[2]}
+            return menu_display
+        except psycopg2.DatabaseError as err:
+            self.db_error_handle(err)
 
 if __name__ == '__main__':
     pass
- 
