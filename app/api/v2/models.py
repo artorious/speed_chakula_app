@@ -11,6 +11,7 @@ import jwt
 
 
 
+
 class DatabaseManager():
     """ Database methods """
     def __init__(self, config_mode=None):
@@ -354,15 +355,3 @@ class MenuOps(DatabaseManager):
 
 if __name__ == '__main__':
     pass
-    # test_db_inst = DatabaseManager('testing')
-    # test_db_inst.create_all_tables()
-    # print('Good to go!!!!')
-
-    # OperationsOnNewUsers({
-    #         'username': 'jesus',
-    #         'email': 'christ@nazareth.com',
-    #         'password': 'iacoziamwhoiam',
-    #         'name': 'J. H. Christian',
-    #     })
-
-        

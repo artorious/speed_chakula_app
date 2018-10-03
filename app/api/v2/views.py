@@ -1,5 +1,6 @@
 """ Defines routes for app """
 
+
 from flask import Blueprint, jsonify, request, make_response
 from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogs
 from app import create_app
