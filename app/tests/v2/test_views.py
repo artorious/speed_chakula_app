@@ -4,14 +4,14 @@ import unittest
 import json
 from app import create_app
 from app.api.v2.models import DatabaseManager
+# from run import ap
 
 class BaseTestCase(unittest.TestCase):
     """ Base Tests """
     def setUp(self):
-        self.app = create_app('testing')
-        self.app = self.app.test_client()
-        self.test_database = DatabaseManager()
-        self.test_database.create_all_tables()
+        self.apps = create_app(config_mode='testing')
+        self.app = self.apps.test_client()
+        
         self.sample_reg_info = {
             'username': 'johnwatson',
             'email': 'consultingdetective@email.com',
@@ -41,6 +41,9 @@ class BaseTestCase(unittest.TestCase):
             'username': 'newmember',
             'password': 'neverevernever'
         }
+        with self.apps.app_context():
+            self.test_database = DatabaseManager()
+            self.test_database.create_all_tables()
         #TODO: Helper methods (login/out)
 
     def tearDown(self):
