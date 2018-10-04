@@ -130,4 +130,5 @@ def place_order():
     """ Place food orders user """
     order_data = request.get_json(force=True)
     msg_out = FoodOrderOperations()
+
     return jsonify(msg_out.place_new_order(order_data))
