@@ -125,9 +125,17 @@ def menu():
     return jsonify(msg_out.fetch_menu_items())
 
 
+<<<<<<< HEAD
 @v2_users_bp.route('/users/orders', methods=['POST'])
 def place_order():
     """ Place food orders user """
     order_data = request.get_json(force=True)
     msg_out = FoodOrderOperations()
+=======
+@v2_users_bp.route('/orders', methods=['POST'])
+def place_order():
+    """ Place food orders user """
+    order_data = request.get_json(force=True)
+    msg_out = FoodOrderOperations
+>>>>>>> 4056fa5baa762d56adc4419f672e0491e2d2e116
     return jsonify(msg_out.place_new_order(order_data))
