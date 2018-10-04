@@ -46,7 +46,7 @@ class DatabaseManager():
         try:
             self.conn=psycopg2.connect(current_app.config['DATABASE_URL'])
             output = self.conn.cursor()
-        except Exception as err:
+        except psycopg2.DatabaseError as err:
             output = None
             print('An Error Occured: {}'.format(err))
 
@@ -279,6 +279,72 @@ class UserCredentialsValidator(OperationsOnNewUsers):
         else:
             msg_out = 'Invalid Password'
         return msg_out
+
+
+class FoodOrderOperations(DatabaseManager):
+    """ Methods to handle food orders """
+    def __init__(self):
+        self.order_status = 'Pending'  # Pending/Accepted/Rejected/Accepted/complete
+        
+    def place_new_order(self, food_order_items):
+        """  Place new food order 
+
+            <food_order_items> 
+                {'2': 
+                {'Cheeseburger.': 600, 'Qty': 6, 'Deliver.': 'ABC place shop no 3'}, 
+                '4': 
+                {'Fries.': 60, 'Qty': 3, 'Deliver.': 'ABC place shop no 3'}, 
+                '5': 
+                {'HotDog.': 100, 'Qty': 4, 'Deliver.': 'ABC place shop no 3'}}
+            <Returns>
+                >>> orders.place_new_order(sample)
+                {'2': {'Cheeseburger.': 600, 'Qty': 6, 'Deliver.': 'ABC place shop no 3'}, 
+                '4': {'Fries.': 60, 'Qty': 3, 'Deliver.': 'ABC place shop no 3'}, 
+                '5': {'HotDog.': 100, 'Qty': 4, 'Deliver.': 'ABC place shop no 3'}, 
+                'Order status': 'Pending', 
+                'Total': 0}
+                >>>
+        """
+        total = 0
+        paybill = {}
+        if isinstance(food_order_items, dict):
+            for food_item in food_order_items:
+                if (
+                        isinstance(food_item, dict) and \
+                        (set((food_item.keys())) == \
+                        set(['foodid', 'qty', 'delivery location']))
+                    ):
+                    if isinstance(food_item['foodid'], int) and \
+                    isinstance(food_item['Qty'], int):
+                    
+                        try:
+                            cur = self.connect_to_db()
+                            cur.execute("select * from menu where foodid = %s;", (food_item[foodid]))
+                            order_items = cur.fetchall()
+                            if order_items == None:
+                                msg_out = {'Msg': 'Food item is no longer prepared'}
+                            else:
+                                total += (order_items[2] * food_item['qty'])
+                                # menu_display = {}
+                                # for menu_item in menu_items:
+                                #     menu_display[menu_item[0]] = {menu_item[3]:menu_item[2]}
+                            
+                        except psycopg2.DatabaseError as err:
+                            self.db_error_handle(err)
+
+                    else:
+                        msg_out = {"Inout Error": "Malformrd input"}
+                else:
+                    msg_out = {"Inout Error": "Malformrd input"}
+
+            paybill['Total'] = total
+            food_order_items['Order status'] = self.order_status
+            food_order_items.update(paybill)
+
+            return food_order_items
+
+        else:
+            msg_out = {"Inout Error": "Expected a dictionat"}
 
 
 if __name__ == '__main__':

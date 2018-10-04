@@ -2,11 +2,12 @@
 
 
 from flask import Blueprint, jsonify, request, make_response
-from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogInOperations, UserCredentialsValidator
+from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogInOperations, UserCredentialsValidator, FoodOrderOperations
 from app import create_app
 
 v2_base_bp = Blueprint('v2_base', __name__, url_prefix='/api/v2')
 v2_auth_bp = Blueprint('v2_auth', __name__, url_prefix='/api/v2/auth')
+v2_users_bp = Blueprint('v2_users', __name__,  url_prefix='/api/v2/users')
 
 
 @v2_base_bp.route('/', methods=['GET'])
@@ -122,3 +123,11 @@ def menu():
     """ Fetch menu items """
     msg_out = MenuOps()
     return jsonify(msg_out.fetch_menu_items())
+
+
+@v2_users_bp.route('/orders', methods=['POST'])
+def place_order():
+    """ Place food orders user """
+    order_data = request.get_json(force=True)
+    msg_out = FoodOrderOperations
+    return jsonify(msg_out.place_new_order(order_data))
