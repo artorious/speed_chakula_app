@@ -21,6 +21,7 @@ flasgger = "*"
 "psycopg2" = "*"
 pyjwt = "*"
 bcrypt = "*"
+pytz = "*"
 
 [dev-packages]
 

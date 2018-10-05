@@ -3,15 +3,16 @@
 import unittest
 import json
 from app import create_app
+from flask import current_app
 from app.api.v2.models import DatabaseManager
+
 
 class BaseTestCase(unittest.TestCase):
     """ Base Tests """
     def setUp(self):
-        self.app = create_app('testing')
-        self.app = self.app.test_client()
-        self.test_database = DatabaseManager()
-        self.test_database.create_all_tables()
+        self.app = create_app(config_mode='testing')
+        self.app = app.test_client()
+        
         self.sample_reg_info = {
             'username': 'johnwatson',
             'email': 'consultingdetective@email.com',
@@ -41,7 +42,10 @@ class BaseTestCase(unittest.TestCase):
             'username': 'newmember',
             'password': 'neverevernever'
         }
-        #TODO: Helper methods (login/out)
+        
+
+        self.test_database = DatabaseManager()
+        self.test_database.create_all_tables()
 
     def tearDown(self):
         self.test_database.drop_all_tables()
@@ -84,7 +88,6 @@ class TestAuthRoutes(BaseTestCase):
             headers={'content-type': 'application/json'}
         )     
         self.assertEqual(test_response.status_code, 201)
-        self.assertNotEqual(test_response.status_code, 405)
         self.assertNotEqual(test_response.status_code, 404)
         self.assertNotEqual(test_response.status_code, 400)
     
@@ -101,7 +104,6 @@ class TestAuthRoutes(BaseTestCase):
         self.assertTrue(response_data["Status"] == "Success")
         self.assertTrue(response_data["Message"] == "Registration successful")
         self.assertTrue(response_data["Authentication token"])
-        self.assertTrue(test_response.content_type == 'application/json')
 
     def test_user_signup_of_an_existing_user(self):
         """ Test that valid path and data for repeated user registration
@@ -153,7 +155,7 @@ class TestAuthRoutes(BaseTestCase):
         response_data = json.loads(test_response.decode())
         self.assertTrue(response_data["Status"] == "Password Error")
         self.assertTrue(response_data["Message"] == "Invalid password. Should be atlest 8 characters long")
-        self.assertTrue(test_response.content_type == 'application/json')
+       
         self.assertEqual(test_response.status_code, 202)
     
     def test_payload_before_posting_for_malformed_input(self):
@@ -168,7 +170,7 @@ class TestAuthRoutes(BaseTestCase):
         response_data = json.loads(test_response.data.decode())
         self.assertTrue(response_data["Status"] == "Operation failed")
         self.assertTrue(response_data["Message"] == "Sorry.... the provided data is malformed")
-        self.assertTrue(test_response.content_type == 'application/json')
+        
 
     def test_login_of_registered_user(self):
         """ Test that a registered user can login """
@@ -182,7 +184,7 @@ class TestAuthRoutes(BaseTestCase):
         self.assertTrue(response_data["Status"] == "Success")
         self.assertTrue(response_data["Message"] == "Registration successful")
         self.assertTrue(response_data["Authentication token"])
-        self.assertTrue(test_response.content_type == 'application/json')
+        
 
         # Try to login
         test_response = self.app.post(
@@ -195,7 +197,7 @@ class TestAuthRoutes(BaseTestCase):
         self.assertTrue(response_data["Status"] == "Success")
         self.assertTrue(response_data["Message"] == "Login successful")
         self.assertTrue(response_data["Authentication token"])
-        self.assertTrue(test_response.content_type == 'application/json')
+        
 
     def test_login_of_non_registered_user(self):
         """ Test that a non-registered user cannot login """
@@ -208,7 +210,7 @@ class TestAuthRoutes(BaseTestCase):
         # self.assertEqual(test_response.status_code, 404)
         self.assertTrue(response_data["Status"] == "Login Error")
         self.assertTrue(response_data["Message"] == "Invalid username/password. Try again")
-        self.assertTrue(test_response.content_type == 'application/json')
+        
 
     def test_login_with_malformed_input(self):
         """ Test that a malformed input cannot login """
@@ -221,7 +223,7 @@ class TestAuthRoutes(BaseTestCase):
         self.assertEqual(response_data.status_code, 404)
         self.assertTrue(response_data["Status"] == "Operation failed")
         self.assertTrue(response_data["Message"] == "Sorry.... the provided data is malformed")
-        self.assertTrue(test_response.content_type == 'application/json')
+        
 
 class MenuRoutes(BaseTestCase):
     """ Tests for menu operations """
@@ -231,4 +233,4 @@ class MenuRoutes(BaseTestCase):
         test_response = self.app.get('/api/v2/menu')
         self.assertEqual(test_response.status_code, 200)
         self.assertNotEqual(test_response.status_code, 404)
-        self.assertTrue(test_response.content_type == 'application/json')
+        
