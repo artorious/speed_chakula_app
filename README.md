@@ -23,12 +23,11 @@ These instructions will get you a copy of the project up and running on your loc
 3. On a  terminal (Linux), Install and set up git `sudo apt install git` 
 4. Clone the repository `git clone https://github.com/artorious/speedy_chakula_app.git`
 5. Run `cd speedy_chakula_app/`
-6. Run `git checkout ch-README-update-160733855`
-7. In a virutal environment, run `pipenv shell` to install requirements
+6. Run `git checkout develop`
+7. In a virutal environment, run `pipenv install --dev ; pipenv shell` to install requirements
 ##### Starting the application
 To run the application and set the envionment variable, 
 
-* run `export FLASK_APP=run.py ; export FLASK_ENV=development`
 * run`flask run`
 
 ###### API Documentation and Endpoints
