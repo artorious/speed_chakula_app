@@ -43,7 +43,6 @@ class DatabaseManager():
 
     def connect_to_db(self):
         """ Create connection to database and return cursor """
-        # print('*************************************************',current_app.config)
         try:
             self.conn=psycopg2.connect(current_app.config['DATABASE_URL'])
             output = self.conn.cursor()
@@ -96,6 +95,13 @@ class DatabaseManager():
             if self.conn:
                 self.conn.rollback()
             print('An Error Occured: {}'.format(err))
+            sys.exit(1)
+
+    def db_error_handle(self, error):
+        """ Roll back transaction and exit incase of error """
+        if self.conn:
+            self.conn.rollback()
+            print('An Error Occured: {}'.format(error))
             sys.exit(1)
 
 
@@ -186,25 +192,21 @@ class UserLogInOperations(OperationsOnNewUsers):
     def __init__(self, user_login_info, admin=False):
         self.raw_username = user_login_info['username']
         self.raw_password = user_login_info['password']
-        
+        self.password = self.raw_password.encode()
     def fetch_and_verify_user_login(self):
         """ Fetch user matching login details provided """
            
         try:
             cur = self.connect_to_db()
             cur.execute(
-                    "SELECT * from users WHERE username LIKE '%s';", (self.raw_username) 
+                    """SELECT * from users WHERE username LIKE '{}';""".format(self.raw_username) 
                 )
             user_details = cur.fetchone()
-            if bcrypt.hashpw(
-                    self.raw_password,bcrypt.gensalt()
-                ).decode() in user_details[6]:
-                msg_out = True
-                self.login_status = True
-            elif user_details == None:
-                msg_out = False
 
-            return msg_out
+            if self.raw_username == user_details[1]:
+                hashed_password = user_details[6]
+                if bcrypt.checkpw(self.password, hashed_password.encode()):            
+                    return True
 
         except psycopg2.DatabaseError as err:
             self.db_error_handle(err)
@@ -267,7 +269,19 @@ class UserCredentialsValidator(OperationsOnNewUsers):
             contains atleast one @ and a . after it
         """
         if re.search(r'[^@]+@[^@]+\.[^@]+', self.raw_email):
-            msg_out = 'Valid Email'
+            try:
+                cur = self.connect_to_db()
+                cur.execute(
+                    "SELECT * from users WHERE email LIKE '{}';".format(self.raw_email) 
+                )
+                email_fetch = cur.fetchone()
+                if email_fetch == None:
+                    msg_out = 'Valid Email'
+                else:
+                    msg_out = 'Email already registerd by another userane'
+            except psycopg2.DatabaseError as err:
+                self.db_error_handle(err)
+
         else:
             msg_out = 'Invalid Email'
 
@@ -288,24 +302,7 @@ class FoodOrderOperations(DatabaseManager):
         self.order_status = 'Pending'  # Pending/Accepted/Rejected/Accepted/complete
         
     def place_new_order(self, food_order_items):
-        """  Place new food order 
-
-            <food_order_items> 
-                {'2': 
-                {'Cheeseburger.': 600, 'Qty': 6, 'Deliver.': 'ABC place shop no 3'}, 
-                '4': 
-                {'Fries.': 60, 'Qty': 3, 'Deliver.': 'ABC place shop no 3'}, 
-                '5': 
-                {'HotDog.': 100, 'Qty': 4, 'Deliver.': 'ABC place shop no 3'}}
-            <Returns>
-                >>> orders.place_new_order(sample)
-                {'2': {'Cheeseburger.': 600, 'Qty': 6, 'Deliver.': 'ABC place shop no 3'}, 
-                '4': {'Fries.': 60, 'Qty': 3, 'Deliver.': 'ABC place shop no 3'}, 
-                '5': {'HotDog.': 100, 'Qty': 4, 'Deliver.': 'ABC place shop no 3'}, 
-                'Order status': 'Pending', 
-                'Total': 0}
-                >>>
-        """
+        """  Place new food order """
         total = 0
         paybill = {}
         if isinstance(food_order_items, dict):
@@ -326,9 +323,6 @@ class FoodOrderOperations(DatabaseManager):
                                 msg_out = {'Msg': 'Food item is no longer prepared'}
                             else:
                                 total += (order_items[2] * food_item['qty'])
-                                # menu_display = {}
-                                # for menu_item in menu_items:
-                                #     menu_display[menu_item[0]] = {menu_item[3]:menu_item[2]}
                             
                         except psycopg2.DatabaseError as err:
                             self.db_error_handle(err)
@@ -340,12 +334,11 @@ class FoodOrderOperations(DatabaseManager):
 
             paybill['Total'] = total
             food_order_items['Order status'] = self.order_status
-            food_order_items.update(paybill)
+            msg_out = food_order_items.update(paybill)
 
-            return food_order_items
-
+            return msg_out
         else:
-            msg_out = {"Inout Error": "Expected a dictionat"}
+            msg_out = {"Inout Error": "Expected a dictionary"}
 
 
 if __name__ == '__main__':

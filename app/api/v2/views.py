@@ -13,7 +13,7 @@ v2_users_bp = Blueprint('v2_users', __name__,  url_prefix='/api/v2/users')
 @v2_base_bp.route('/', methods=['GET'])
 def index():
     """ Homepage. Returns welcome message """
-    return jsonify("Welcome User. Speedy Chakula delivers fast-food-fast")
+    return make_response(jsonify("Welcome User. Speedy Chakula delivers fast-food-fast")), 200
 
 
 @v2_auth_bp.route('/signup', methods=['POST'])
@@ -34,21 +34,21 @@ def signup():
                 "Status": "Username Error",
                 "Message": "Username already exists. Try a different username"
             }
-            return make_response(jsonify(msg_out)), 202
+            return make_response(jsonify(msg_out)), 400
 
         elif raw_user.email_check() != 'Valid Email':
             msg_out = {
                 "Status": "Email Error",
-                "Message": "Invalid Email address. Check syntax and try again"
+                "Message": "Invalid Email address."
             }
-            return make_response(jsonify(msg_out)), 202
+            return make_response(jsonify(msg_out)), 400
 
         elif raw_user.password_check() != 'Valid Password':
             msg_out = {
                 "Status" : "Password Error",
                 "Message": "Invalid password. Should be atlest 8 characters long"
             }
-            return make_response(jsonify(msg_out)), 202
+            return make_response(jsonify(msg_out)), 400
         else:
 
             new_user = OperationsOnNewUsers(signup_data)  # Instantate
@@ -69,14 +69,14 @@ def signup():
                     "Status": "Registration failed",
                     "Message": 'Error: {}'.format(err)
                 }
-                return  make_response(jsonify(msg_out)), 401
+                return  make_response(jsonify(msg_out)), 400
              
     else:
         msg_out = {
             "Status" : "Operation failed",
             "Message": "Sorry.... the provided data is malformed"
         }
-        return jsonify(msg_out)
+        return make_response(jsonify(msg_out)), 400
 
 
 @v2_auth_bp.route('/login', methods=['POST'])
@@ -90,12 +90,9 @@ def login():
         try:
             attempting_user = UserLogInOperations(login_data)  # Instantate
             if attempting_user.fetch_and_verify_user_login():
-                auth_token =  attempting_user.auth_token_encoding()
-                if auth_token:
-                    msg_out = {
+                msg_out = {
                     "Status": "Success",
                     "Message": "Login successful",
-                    "Authentication token": auth_token.decode()
                 } 
             
             else:
@@ -109,20 +106,20 @@ def login():
                     "Status": "Login failed",
                     "Message": 'Error: {}'.format(err)
                 }
-                return  make_response(jsonify(msg_out)), 500
+                return  make_response(jsonify(msg_out)), 403
     else:
         msg_out = {
             "Status" : "Operation failed",
             "Message": "Sorry.... the provided data is malformed"
         }
-        return jsonify(msg_out), 500
+        return jsonify(msg_out), 403
  
 
 @v2_base_bp.route('/menu', methods=['GET'])
 def menu():
     """ Fetch menu items """
     msg_out = MenuOps()
-    return jsonify(msg_out.fetch_menu_items())
+    return make_response(jsonify(msg_out.fetch_menu_items())), 200
 
 
 @v2_users_bp.route('/users/orders', methods=['POST'])
@@ -131,4 +128,4 @@ def place_order():
     order_data = request.get_json(force=True)
     msg_out = FoodOrderOperations()
 
-    return jsonify(msg_out.place_new_order(order_data))
+    return make_response(jsonify(msg_out.place_new_order(order_data))), 200
