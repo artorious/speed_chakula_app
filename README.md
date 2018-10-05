@@ -32,20 +32,26 @@ To run the application and set the envionment variable,
 
 ###### API Documentation and Endpoints
 
-* [API Documentation on postman](https://documenter.getpostman.com/view/3796196/RWaPskzj)
-
+* [Version 1 API Documentation on postman](https://documenter.getpostman.com/view/3796196/RWaPskzj)
+* [Version 2 API Documentation on postman](https://documenter.getpostman.com/view/3796196/RWgnWKjr)
 Method | Endpoint | Functionality
 --- | --- | ---
 GET | /api/v1/orders | Fetches all existing food orders
 GET | api/v1/orders/<orderid> | Fetches a specific food order
 POST | api/v1/orders | Creates a new food order
 PUT  | api/v1/orders/<orderid> | Updates the status of a food order
+--- | ---| ---
+POST | /api/v2/auth/signup | New User Registration
+POST | api/v2/auth/login | User login
+GET | api/v2/menu | Display menu of available food items
+POST  | api/v2/users/orders | Place a food order
+
   
 ###### Running tests
 
 On a terminal Run `coverage run -m pytest -v app/tests/v1/test* ; coverage report app/tests/v1/test_*  app/api/v1/*.py `
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/dbfd44a4306fe46d66a4)
-
+[![Run version 1 in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/dbfd44a4306fe46d66a4)
+[![Run version 2 in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/f3b5dc9264f6b857b13c)
 ###### Deployment
 Visit the deployed app on [Heroku](https://speedy-chakula-api-heroku.herokuapp.com/api/v1)

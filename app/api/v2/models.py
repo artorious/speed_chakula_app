@@ -44,7 +44,7 @@ class DatabaseManager():
     def connect_to_db(self):
         """ Create connection to database and return cursor """
         try:
-            self.conn=psycopg2.connect(current_app.config['DATABASE_URL'])
+            self.conn = psycopg2.connect(current_app.config['DATABASE_URL'])
             output = self.conn.cursor()
         except psycopg2.DatabaseError as err:
             output = None
@@ -249,7 +249,7 @@ class UserCredentialsValidator(OperationsOnNewUsers):
         try:
             cur = self.connect_to_db()
             cur.execute(
-                    "SELECT * from users WHERE username LIKE '{}';".format(self.raw_username) 
+                    "SELECT * from users WHERE username LIKE '{}';".format(self.raw_username)
                 )
             username_fetch = cur.fetchone()
             if username_fetch == None:
@@ -272,7 +272,7 @@ class UserCredentialsValidator(OperationsOnNewUsers):
             try:
                 cur = self.connect_to_db()
                 cur.execute(
-                    "SELECT * from users WHERE email LIKE '{}';".format(self.raw_email) 
+                    "SELECT * from users WHERE email LIKE '{}';".format(self.raw_email)
                 )
                 email_fetch = cur.fetchone()
                 if email_fetch == None:
@@ -300,7 +300,7 @@ class FoodOrderOperations(DatabaseManager):
     """ Methods to handle food orders """
     def __init__(self):
         self.order_status = 'Pending'  # Pending/Accepted/Rejected/Accepted/complete
-        
+
     def place_new_order(self, food_order_items):
         """  Place new food order """
         total = 0
@@ -343,4 +343,3 @@ class FoodOrderOperations(DatabaseManager):
 
 if __name__ == '__main__':
     pass
-

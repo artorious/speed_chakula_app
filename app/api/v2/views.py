@@ -3,7 +3,7 @@
 
 from flask import Blueprint, jsonify, request, make_response
 from app.api.v2.models import MenuOps, OperationsOnNewUsers, UserLogInOperations, UserCredentialsValidator, FoodOrderOperations
-from app import create_app
+
 
 v2_base_bp = Blueprint('v2_base', __name__, url_prefix='/api/v2')
 v2_auth_bp = Blueprint('v2_auth', __name__, url_prefix='/api/v2/auth')
@@ -63,14 +63,14 @@ def signup():
                     "Authentication token": auth_token.decode()
                 }
                 return  make_response(jsonify(msg_out)), 201
-            
+
             except Exception as err:
                 msg_out = {
                     "Status": "Registration failed",
                     "Message": 'Error: {}'.format(err)
                 }
                 return  make_response(jsonify(msg_out)), 400
-             
+
     else:
         msg_out = {
             "Status" : "Operation failed",
@@ -85,7 +85,7 @@ def login():
     login_data = request.get_json(force=True)
     if (
             'username' in login_data and
-            'password' in login_data        
+            'password' in login_data
         ):
         try:
             attempting_user = UserLogInOperations(login_data)  # Instantate
@@ -93,8 +93,8 @@ def login():
                 msg_out = {
                     "Status": "Success",
                     "Message": "Login successful",
-                } 
-            
+                }
+
             else:
                 msg_out = {
                     "Status" : "Login Error",
@@ -113,7 +113,7 @@ def login():
             "Message": "Sorry.... the provided data is malformed"
         }
         return jsonify(msg_out), 403
- 
+
 
 @v2_base_bp.route('/menu', methods=['GET'])
 def menu():
